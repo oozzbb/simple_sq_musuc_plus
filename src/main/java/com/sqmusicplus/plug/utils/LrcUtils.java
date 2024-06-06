@@ -29,7 +29,7 @@ public class LrcUtils {
         stringBuffer.append("[ti:"+songName+"]\n" +
             "[ar:"+artist+"]\n" +
             "[al:"+album+"]\n" +
-            "[by: SqMusic]\n" +
+            "[by: SqMusic-kw]\n" +
             "[offset:0]\n");
         krcList.forEach(e->{
             String time = e.getTime();
@@ -83,7 +83,7 @@ public class LrcUtils {
         StringBuffer stringBuffer = new StringBuffer();
         try {
             stringBuffer.append("[ti:"+split[1]+"]\n" +
-                    "[by: SqMusic]\n" +
+                    "[by: SqMusic-mg]\n" +
                     "[offset:0]\n");
         } catch (Exception e) {
         }
@@ -94,5 +94,6 @@ public class LrcUtils {
 
 
     }
+
 
 }

@@ -108,7 +108,7 @@ public class NeteaseHander extends SearchHanderAbstract {
         plugSearchResult.setSearchIndex(searchKeyData.getPageIndex())
                 .setSearchSize(searchKeyData.getPageSize())
                 .setSearchType(searchKeyData.getSearchType())
-                .setSearchTotal( searchMusicResult.getResult().getSongCount())
+                .setSearchTotal( searchMusicResult.getResult().getSongCount().intValue())
                 .setSearchKeyWork(searchKeyData.getSearchkey())
                 .setRecords(plugSearchMusicResults);
         plugSearchResult.setSearchType(searchKeyData.getSearchType());

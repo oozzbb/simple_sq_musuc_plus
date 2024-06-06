@@ -14,7 +14,7 @@ import java.util.zip.InflaterInputStream;
  * @Description TODO
  * @Version 1.0.0
  * @Date 2023/8/19 14:08
- * @Created by Administrator
+ * @Created by SQ
  */
 
 public class ZLibUtils {
