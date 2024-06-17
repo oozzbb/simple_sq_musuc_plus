@@ -94,6 +94,7 @@ public abstract class SearchHanderAbstract implements SearchHander, Serializable
                             try {
                                 String suffix = FileTypeUtil.getType(onArtistsPhoto);
                                 FileUtil.copy(onArtistsPhoto, new File(downliadpath+File.separator+"cover."+suffix), false);
+                                FileUtil.copy(onArtistsPhoto, new File(downliadpath+File.separator+"artist."+suffix), false);
                                 //取出文件名后缀
                                 FileUtil.copy(onArtistsPhoto, new File(downliadpath + File.separator + "folder."+suffix), true);
                             } catch (Exception e) {
@@ -139,6 +140,7 @@ public abstract class SearchHanderAbstract implements SearchHander, Serializable
                             try {
                                 String suffix = FileTypeUtil.getType(onAlbumImg);
                                 FileUtil.copy(onAlbumImg, new File(imagePath + File.separator + "cover."+suffix), true);
+                                FileUtil.copy(onAlbumImg, new File(imagePath + File.separator + "album."+suffix), true);
                                 if (downloadEntity.getAudioBook()) {
                                     FileUtil.copyFile(cover, Artistsfile);
                                 }

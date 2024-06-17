@@ -193,6 +193,9 @@ public class QQHander extends SearchHanderAbstract {
 
 
 
+
+
+
         String platform = "qq";
         String t2 = brType.getValue().split("_")[0];
         String device = "MI 14 Pro Max";
@@ -210,7 +213,7 @@ public class QQHander extends SearchHanderAbstract {
         byte[] compress = ZLibUtils.compress(encodedBytes);
         HTTP http = DownloadUtils.getHttp();
 //        SHttpTask sync = http.sync(config.getDownloadUrl());
-        SHttpTask sync = http.sync("http://app.kzti.top/client/cgi-bin/api.fcg");
+        SHttpTask sync = http.sync("http://gcsp.kzti.top:1030/client/cgi-bin/api.fcg");
         sync.setBodyPara(compress);
         HttpResult post = sync.post();
         byte[] decompress = ZLibUtils.decompress(post.getBody().toBytes());
@@ -222,6 +225,34 @@ public class QQHander extends SearchHanderAbstract {
         stringStringHashMap.put("type", brType.getType());
         stringStringHashMap.put("bit", brType.getBit().toString());
         return stringStringHashMap;
+//        String deonloadType = "flac";
+//        Integer bit = brType.getBit();
+//        if (bit == 128) {
+//            deonloadType = "128k";
+//        } else if (bit == 320) {
+//            deonloadType = "320k";
+//        } else {
+//            deonloadType =  "flac";
+//        }
+//        HTTP http = DownloadUtils.getHttp();
+//        QQConfig config = getConfig();
+//        String downloadUrl = config.getDownloadUrl();
+//        downloadUrl = downloadUrl.replaceAll("#\\{pmid}", musicId).replaceAll("#\\{brType}", deonloadType);
+//        HttpResult post = http.sync(downloadUrl).addHeader("X-Request-Key","ikunsource")
+//                .addHeader("Accept","*/*")
+//                .addHeader("Accept-Encoding","gzip, deflate, br")
+//                .get();
+//        Mapper mapper = post.getBody().toMapper();
+//        int code = mapper.getInt("code");
+//        if (code != 0) {
+//            return null;
+//        }
+//        String downloadurl = mapper.getString("data");
+//        HashMap<String, String> stringStringHashMap = new HashMap<>();
+//        stringStringHashMap.put("url", downloadurl);
+//        stringStringHashMap.put("type", brType.getType());
+//        stringStringHashMap.put("bit", brType.getBit().toString());
+//        return stringStringHashMap;
     }
 
     @Override
