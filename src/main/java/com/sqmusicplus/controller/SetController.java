@@ -97,8 +97,8 @@ public class SetController {
         QQoption.put("value","qq");
         QQoption.put("label","鹅厂(不要太过频繁否则无法下载)");
         HashMap<String, String> QQVIPoption = new HashMap<>();
-        QQoption.put("value","qqvip");
-        QQoption.put("label","鹅厂VIP下载（请自行配置接口否则无法使用）");
+        QQVIPoption.put("value","qqvip");
+        QQVIPoption.put("label","鹅厂VIP下载（请自行配置接口否则无法使用）");
         HashMap<String, String> MGoption = new HashMap<>();
         MGoption.put("value","mg");
         MGoption.put("label","10086(有问题暂停使用)");
