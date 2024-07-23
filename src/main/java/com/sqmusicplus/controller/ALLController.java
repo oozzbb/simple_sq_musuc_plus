@@ -27,11 +27,13 @@ import com.sqmusicplus.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
 
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -515,7 +517,7 @@ public class ALLController {
     }
 
 
-//    @SaCheckLogin
+    @SaCheckLogin
     @PostMapping("/download/freemp3")
     public String freemp3Download(@Valid  @RequestBody PlugFreeMp3DownloadEntity data) throws Exception {
 
@@ -556,6 +558,78 @@ public class ALLController {
 
         return redirectUrl;
     }
+
+
+    @GetMapping(value = "/download/freemp3",produces = MediaType.TEXT_HTML_VALUE)
+    public String freemp3DownloadGet(@RequestParam String downloadurl,
+                                     @RequestParam String musicname,
+                                     @RequestParam String musicalbumName,
+                                     @RequestParam String musicartistName,
+                                     @RequestParam String musicimage,
+                                     @RequestParam String musiclyrc,
+                                     @RequestParam String sqmusictoken
+    ) throws Exception {
+        Object loginIdByToken = StpUtil.getLoginIdByToken(sqmusictoken);
+        if(loginIdByToken == null){
+            return AjaxResult.error("登录过期").toString();
+        }
+        String redirectUrl = OkHttpUtils.getRedirectUrl(downloadurl);
+        String[] split = musicname.split("-");
+        String musicName = null;
+        try {
+            musicName = split[0].trim();
+        } catch (Exception e) {
+            musicName = musicname;
+        }
+
+        String artistName = null;
+        if (StringUtils.isBlank(musicartistName)){
+            try {
+                artistName = split[1].trim();
+            } catch (Exception e) {
+                artistName="";
+            }
+        }else{
+            artistName = musicartistName;
+        }
+        if (StringUtils.isBlank(musicalbumName)){
+            //网易喜欢搞这种的  酷我是无专辑大户
+            musicalbumName = musicName;
+        }
+
+        String finalMusicName = musicName;
+        String finalArtistName = artistName;
+        String finalMusicalbumName = musicalbumName;
+        threadPoolTaskExecutor.execute(() -> {
+            DownloadEntity download = freeMp3Hander.download(finalMusicName, finalArtistName, finalMusicalbumName, musiclyrc, musicimage, redirectUrl);
+            downloadInfoService.add(MusicUtils.downloadEntitytoDownloadInfoTo(download));
+        });
+
+
+        return "<html>" +
+                "<header><title>Welcome</title></header>" +
+                "<body>" +
+                "即将自动关闭" +
+                "<a href=\"javascript:window.opener=null;window.open('','_self');window.close();\">手动关闭</a>" +
+                "</body>" +
+                "<script>" +
+                "function closeWindow(){\n" +
+                "\tvar userAgent = navigator.userAgent;\n" +
+                "\tif (userAgent.indexOf(\"Firefox\") != -1 || userAgent.indexOf(\"Chrome\") !=-1) {\n" +
+                "\t\t\twindow.location.href=\"about:blank\";\n" +
+                "\t\t\twindow.close();\n" +
+                "\t} else {\n" +
+                "\t\t\twindow.opener = null;\n" +
+                "\t\t\twindow.open(\"\", \"_self\");\n" +
+                "\t\t\twindow.close();\n" +
+                "\t}\n" +
+                "}"+
+                "closeWindow()"+
+                "</script>"+
+                "</html>";
+    }
+
+
 
 }
 

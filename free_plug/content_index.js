@@ -8,6 +8,16 @@ var musicartistName = "";
 var musicalbumName = "";
 
 
+//   // 手动添加mate标签
+//   const addMeta = (name, content) => {
+//     const meta = document.createElement('meta');
+//     meta.content = content;
+//     meta.httpEquiv = name;
+//     document.getElementsByTagName('head')[0].appendChild(meta);
+//   };
+
+//   addMeta("Content-Security-Policy", "upgrade-insecure-requests")
+
 
 
 
@@ -182,41 +192,45 @@ function push(musicname,musicartistName,musicalbumName,downloadurl,musicimage,mu
         
     console.log("下载地址："+"musiclyrc请求的URL：" + musiclyrc);
 // 需要发送的数据
-const data = {
-    "musicname": musicname,
-    "musicartistName": musicartistName,
-    "musicalbumName": musicalbumName,
-    "downloadurl": downloadurl,
-    "musicimage": musicimage,
-    "musiclyrc": musiclyrc,
-};
- 
+// const data = {
+//     "musicname": musicname,
+//     "musicartistName": musicartistName,
+//     "musicalbumName": musicalbumName,
+//     "downloadurl": downloadurl,
+//     "musicimage": musicimage,
+//     "musiclyrc": musiclyrc,
+// };
+pushdiv.innerText="推送成功！";
+let pushdata = "?musicname="+musicname+"&musicartistName="+musicartistName+"&musicalbumName="+musicalbumName+"&downloadurl="+downloadurl+"&musicimage="+musicimage+"&musiclyrc="+musiclyrc+"&sqmusictoken="+pushtoken;
+// window.open(url+pushdata, '_blank');
+window.open(url+pushdata, '_blank','width=1,height=1');
 
-    var xhr = new XMLHttpRequest(); 
-    xhr.open('POST', url, true); 
-    xhr.setRequestHeader('Content-Type', 'application/json'); 
-    xhr.setRequestHeader("sqmusic",pushtoken);
-    xhr.onload = function () {
-        if(xhr.status==401){
-            alert("token过期，请重新配置")
-            pushdiv.innerText="推送失败！（token过期，请重新配置）";
-        }
-        if(xhr.status==404){
-            alert("URL错误未找到服务器")
-            pushdiv.innerText="推送失败！（URL错误未找到服务器）";
-        }
-        if (xhr.status >= 200 && xhr.status < 300) {
-            // 请求成功，处理响应数据
-            console.log("返回数据：");
-            console.log(xhr.responseText);
-            pushdiv.innerText="推送成功！";
-        } else {
-            // 请求失败，处理错误
-            pushdiv.innerText="推送失败！（未知异常）";
-            console.error('Request fAIled:', xhr.statusText);
-        }
-    };
-    xhr.send(JSON.stringify(data)); 
+
+    // var xhr = new XMLHttpRequest(); 
+    // xhr.open('POST', url, true); 
+    // xhr.setRequestHeader('Content-Type', 'application/json'); 
+    // xhr.setRequestHeader("sqmusic",pushtoken);
+    // xhr.onload = function () {
+    //     if(xhr.status==401){
+    //         alert("token过期，请重新配置")
+    //         pushdiv.innerText="推送失败！（token过期，请重新配置）";
+    //     }
+    //     if(xhr.status==404){
+    //         alert("URL错误未找到服务器")
+    //         pushdiv.innerText="推送失败！（URL错误未找到服务器）";
+    //     }
+    //     if (xhr.status >= 200 && xhr.status < 300) {
+    //         // 请求成功，处理响应数据
+    //         console.log("返回数据：");
+    //         console.log(xhr.responseText);
+    //         pushdiv.innerText="推送成功！";
+    //     } else {
+    //         // 请求失败，处理错误
+    //         pushdiv.innerText="推送失败！（未知异常）";
+    //         console.error('Request fAIled:', xhr.statusText);
+    //     }
+    // };
+    // xhr.send(JSON.stringify(data)); 
 
     
 }

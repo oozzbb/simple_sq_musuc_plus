@@ -1,6 +1,7 @@
 server:
   port: 8099
 spring:
+
   datasource:
 #    url: jdbc:sqlite::resource:sqlite/sqmusic.db
 #    url: jdbc:sqlite:/D:\\music\\sqmusic.db
@@ -57,4 +58,4 @@ sa-token:
   # 是否输出操作日志
   is-log: false
 
-version: 2.11.2
+version: 2.11.3
