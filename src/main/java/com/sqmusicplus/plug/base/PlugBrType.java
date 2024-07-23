@@ -26,13 +26,21 @@ public enum PlugBrType {
     NETEASE_MP3_192("higher", "mp3", 192,"netease","neteaseHander"),
     NETEASE_MP3_320("exhigh", "mp3", 320,"netease","neteaseHander"),
     NETEASE_FLAC_2000("lossless", "flac", 2000,"netease","neteaseHander"),
-    NETEASE_FLAC_3000("hires", "flac", 3000,"netease","neteaseHander");
+    NETEASE_FLAC_3000("hires", "flac", 3000,"netease","neteaseHander"),
 
 
 
+    QQVIP_MP3_128("128","mp3",128,"qqvip","qqvipHander"),
+    QQVIP_MP3_320("320","mp3",320,"qqvip","qqvipHander"),
+    QQVIP_Flac_2000("flac","flac",2000,"qqvip","qqvipHander"),
+    QQVIP_Flac_3000("flac","falc",3000,"qqvip","qqvipHander"),
+    QQVIP_Flac_4000("flac","falc",4000,"qqvip","qqvipHander"),
+    QQVIP_Flac_5000("flac","falc",5000,"qqvip","qqvipHander"),
+    QQVIP_Ape_2000("ape","ape",2000,"qqvip","qqvipHander"),
+    QQVIP_M4A_2000("m4a","m4a",3000,"qqvip","qqvipHander"),
 
 
-
+    Free_Download_2000("flac","flac",2000,"free","freeMp3Hander");
 
 
     String value;

@@ -7,13 +7,13 @@ import okhttp3.*;
 import org.jsoup.Jsoup;
 
 import javax.net.ssl.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -28,6 +28,9 @@ import java.util.function.Consumer;
 public class DownloadUtils {
 
    private static HTTP http = null;
+    private static OkHttpClient okHttpClient;
+
+
 
     public static HTTP getHttp()  {
         if (http==null){
@@ -109,16 +112,26 @@ public class DownloadUtils {
     }
 
     public static void download(String url ,File file,Consumer<File> onSuccess,Consumer<Download.Failure> onFailure){
-        download(url,file,null,onSuccess,onFailure,null);
+        download(url,file,null,null,onSuccess,onFailure,null);
+    }
+    public static void download(String url ,File file,HashMap<String,String> headers,Consumer<File> onSuccess,Consumer<Download.Failure> onFailure){
+        download(url,file,headers,null,onSuccess,onFailure,null);
     }
     public static void download(String url ,File file,Consumer<File> onSuccess,Consumer<Download.Failure> onFailure,Consumer<Download.Status> onComplete){
-        download(url,file,null,onSuccess,onFailure,onComplete);
+        download(url,file,null,null,onSuccess,onFailure,onComplete);
+    }
+    public static void download(String url , File file, HashMap<String,String> headers, Consumer<File> onSuccess, Consumer<Download.Failure> onFailure, Consumer<Download.Status> onComplete){
+        download(url,file,headers,null,onSuccess,onFailure,onComplete);
     }
 
-    public static void download(String url, File file, Consumer<Process> onProcess,Consumer<File> onSuccess,Consumer<Download.Failure> onFailure,Consumer<Download.Status> onComplete) {
+    public static void download(String url, File file,HashMap<String,String> headers, Consumer<Process> onProcess,Consumer<File> onSuccess,Consumer<Download.Failure> onFailure,Consumer<Download.Status> onComplete) {
             //开始下载
             HTTP http = getHttp();
-            HttpResult.Body body = http.sync(url)
+        SHttpTask sync = http.sync(url);
+        if (headers!=null){
+            sync.addHeader(headers);
+        }
+        HttpResult.Body body = sync
                     .get()
 //                    .getResult()
                     .getBody();
@@ -168,6 +181,51 @@ public class DownloadUtils {
 
 
 
+    /**
+     * @param url          下载连接
+     * @param file  下载的文件
+     */
+
+    public static boolean download(final String url, final File file)  {
+
+    if(okHttpClient==null){
+        okHttpClient = new OkHttpClient();
+    }
+
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+                .get()
+                .build();
+
+        Response response = null;
+        try {
+            response = okHttpClient.newCall(request).execute();
+        } catch (IOException e) {
+        }
+        InputStream inputStream = response.body().byteStream();
+        return WriteFile4InputStream(file, inputStream);
+
+    }
+
+
+
+    public static boolean WriteFile4InputStream(File file, InputStream inputStream)
+    {
+        //默认为flase 即失败
+        boolean result = false;
+        try {
+            OutputStream os = new FileOutputStream(file);
+            os.write(inputStream.readAllBytes());
+            os.close();
+            result = true;
+        }catch (IOException e)
+        {
+            e.printStackTrace();
+            result = false;
+        }
+        return result;
+    }
 
 
 

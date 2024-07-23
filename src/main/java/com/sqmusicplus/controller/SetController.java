@@ -96,6 +96,9 @@ public class SetController {
         HashMap<String, String> QQoption = new HashMap<>();
         QQoption.put("value","qq");
         QQoption.put("label","鹅厂(不要太过频繁否则无法下载)");
+        HashMap<String, String> QQVIPoption = new HashMap<>();
+        QQoption.put("value","qqvip");
+        QQoption.put("label","鹅厂VIP下载（请自行配置接口否则无法使用）");
         HashMap<String, String> MGoption = new HashMap<>();
         MGoption.put("value","mg");
         MGoption.put("label","10086(有问题暂停使用)");
@@ -105,6 +108,7 @@ public class SetController {
         neteaseoption.put("label","猪厂");
         hashMaps.add(kwoption);
         hashMaps.add(QQoption);
+        hashMaps.add(QQVIPoption);
         hashMaps.add(MGoption);
         hashMaps.add(neteaseoption);
         return AjaxResult.success(hashMaps);
@@ -113,4 +117,6 @@ public class SetController {
     public AjaxResult getVersion(){
         return AjaxResult.success("成功", version);
     }
+
+
 }

@@ -2,15 +2,16 @@ server:
   port: 8099
 spring:
   datasource:
-#    url: jdbc:sqlite::resource:sqlite/sqmusic.db
-    url: jdbc:sqlite:/cache/sqmusic.db
+    url: jdbc:sqlite::resource:sqlite/sqmusic.db
+#    url: jdbc:sqlite:/D:\\music\\sqmusic.db
+#    url: jdbc:sqlite:/cache/sqmusic.db
     driver-class-name: org.sqlite.JDBC
     username:
     password:
   jackson:
     default-property-inclusion: non_null
   profiles:
-    active: plug,qq,netease
+    active: plug,qq,netease,qqvip
   mvc:
     static-path-pattern: /**
   web:
@@ -28,10 +29,11 @@ mybatis-plus:
   mapperLocations: classpath*:mapper/*Mapper.xml
   # 加载全局的配置文件
   configuration:
-    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
     cache-enabled: true
   global-config:
     db-config:
+#      select-strategy: NOT_NULL
       select-strategy: NOT_NULL
 
 # 日志配置
@@ -55,4 +57,4 @@ sa-token:
   # 是否输出操作日志
   is-log: false
 
-version: 2.10.1
+version: 2.11.0

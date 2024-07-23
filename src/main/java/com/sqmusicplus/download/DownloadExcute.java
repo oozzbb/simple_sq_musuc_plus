@@ -1,5 +1,7 @@
 package com.sqmusicplus.download;
 
+import cn.hutool.core.lang.reflect.MethodHandleUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -80,8 +82,13 @@ public class DownloadExcute {
                         downloadInfoService.updateById(record);
                         log.debug("修改进行中状态--->{}",record);
                         DownloadEntity downloadEntity = MusicUtils.downloadInfoToDownloadEntity(record);
-                        SearchHander bean = SpringContextUtil.getBean(record.getSpringName());
-                        bean.dnonloadAndSaveToFile(downloadEntity, bean);
+                        Object bean = SpringContextUtil.getBean(record.getSpringName());
+                        if (bean instanceof SearchHander){
+                            SearchHander searchHander = (SearchHander) bean;
+                            searchHander.dnonloadAndSaveToFile(downloadEntity, searchHander);
+                        }else{
+                            ReflectUtil.invoke(bean, "dnonloadAndSaveToFile", downloadEntity, bean);
+                        }
                         try {
                             addSubsonicPlayList(downloadEntity);
                         } catch (Exception e) {
@@ -91,6 +98,7 @@ public class DownloadExcute {
                         downloadInfoService.updateById(record);
                         log.debug("修改完成状态--->{}",record);
                     } catch (Exception e) {
+                        e.printStackTrace();
                         record.setStatus(DownloadStatus.error.getValue());
                         record.setDownloadMsg(e.getMessage());
                         downloadInfoService.updateById(record);

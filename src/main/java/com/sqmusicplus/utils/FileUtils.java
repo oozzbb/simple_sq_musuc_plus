@@ -63,9 +63,9 @@ public class FileUtils
                 }
             }
         } catch (Exception e) {
-            return new File("");
+            return null;
         }
-        return new File("");
+        return null;
     }
 
 

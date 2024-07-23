@@ -79,6 +79,11 @@ public class NeteaseHander extends SearchHanderAbstract {
     }
 
     @Override
+    public String getPlugName() {
+        return "netease";
+    }
+
+    @Override
     public PlugSearchResult<PlugSearchMusicResult> querySongByName(SearchKeyData searchKeyData) {
         JSONObject parameter = new JSONObject();// 请求参数
         parameter.put("keywords", searchKeyData.getSearchkey());
@@ -99,7 +104,7 @@ public class NeteaseHander extends SearchHanderAbstract {
                         .setArtistid(songsDTO.getAr().get(0).getId().toString())
                         .setAlbumid(songsDTO.getAl().getId().toString())
                         .setId(songsDTO.getId().toString())
-                        .setSearchType(searchKeyData.getSearchType())
+                        .setSearchType(getPlugName())
                         .setName(songsDTO.getName());
 //                        .setOter(JSONObject.toJSONString(songsDTO));
                 plugSearchMusicResults.add(plugSearchMusicResult);
@@ -107,11 +112,11 @@ public class NeteaseHander extends SearchHanderAbstract {
         }
         plugSearchResult.setSearchIndex(searchKeyData.getPageIndex())
                 .setSearchSize(searchKeyData.getPageSize())
-                .setSearchType(searchKeyData.getSearchType())
+                .setSearchType(getPlugName())
                 .setSearchTotal( searchMusicResult.getResult().getSongCount().intValue())
                 .setSearchKeyWork(searchKeyData.getSearchkey())
                 .setRecords(plugSearchMusicResults);
-        plugSearchResult.setSearchType(searchKeyData.getSearchType());
+        plugSearchResult.setSearchType(getPlugName());
         return plugSearchResult;
     }
 
@@ -132,7 +137,7 @@ public class NeteaseHander extends SearchHanderAbstract {
                 PlugSearchArtistResult plugSearchArtistResult = new PlugSearchArtistResult()
                         .setArtistName(artistsDTO.getName())
                         .setArtistid(artistsDTO.getId().toString())
-                        .setSearchType(searchKeyData.getSearchType())
+                        .setSearchType(getPlugName())
                         .setPic(artistsDTO.getPicUrl())
                         .setTotal(artistsDTO.getAlbumSize().toString());
                 plugSearchArtistResults.add(plugSearchArtistResult);
@@ -140,11 +145,11 @@ public class NeteaseHander extends SearchHanderAbstract {
         }
         plugSearchResult.setSearchIndex(searchKeyData.getPageIndex())
                 .setSearchSize(searchKeyData.getPageSize())
-                .setSearchType(searchKeyData.getSearchType())
+                .setSearchType(getPlugName())
                 .setSearchTotal(artistNeteaseResult.getResult().getArtistCount())
                 .setSearchKeyWork(searchKeyData.getSearchkey())
                 .setRecords(plugSearchArtistResults);
-        plugSearchResult.setSearchType(searchKeyData.getSearchType());
+        plugSearchResult.setSearchType(getPlugName());
         return plugSearchResult;
 
     }
@@ -168,14 +173,14 @@ public class NeteaseHander extends SearchHanderAbstract {
                         .setAlbumid(albumsDTO.getId().toString())
                         .setArtistName(albumsDTO.getArtist().getName())
                         .setArtistid(albumsDTO.getArtist().getId().toString())
-                        .setSearchType(searchKeyData.getSearchType())
+                        .setSearchType(getPlugName())
                         .setPic(albumsDTO.getPicUrl());
                 plugSearchAlbumResults.add(plugSearchAlbumResult);
             });
         }
         plugSearchResult.setSearchIndex(searchKeyData.getPageIndex())
                 .setSearchSize(searchKeyData.getPageSize())
-                .setSearchType(searchKeyData.getSearchType())
+                .setSearchType(getPlugName())
                 .setSearchTotal(albumsNeteaseResult.getResult().getAlbumCount())
                 .setSearchKeyWork(searchKeyData.getSearchkey())
                 .setRecords(plugSearchAlbumResults);

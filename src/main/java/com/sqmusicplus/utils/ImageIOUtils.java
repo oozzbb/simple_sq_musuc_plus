@@ -1,9 +1,6 @@
 package com.sqmusicplus.utils;
 
-import javax.imageio.IIOException;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReadParam;
-import javax.imageio.ImageReader;
+import javax.imageio.*;
 import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -102,5 +99,28 @@ public class ImageIOUtils {
         ColorModel cm = new ComponentColorModel(cs, false, true,
                 Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
         return new BufferedImage(cm, (WritableRaster) raster, true, null);
+    }
+    /**
+     * 无损压缩
+     */
+    public  static File convertWebpToJpeg(File webpFile, File jpgFile) {
+
+        // 使用ImageIO读取WebP图像
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(webpFile);
+            // 使用ImageIO将图像写入JPEG格式
+            boolean result = ImageIO.write(image, "jpg", jpgFile);
+            if (!result) {
+               return webpFile;
+            }
+            return jpgFile;
+        } catch (IOException e) {
+            return webpFile;
+        }
+
+
+
+
     }
 }

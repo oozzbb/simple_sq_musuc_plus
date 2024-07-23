@@ -1,7 +1,15 @@
 package com.sqmusicplus.utils;
 
+import cn.hutool.core.io.FileTypeUtil;
+import cn.hutool.core.io.IoUtil;
+import org.apache.tika.Tika;
+import org.apache.tika.mime.MimeType;
+import org.apache.tika.mime.MimeTypeException;
+import org.apache.tika.mime.MimeTypes;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * @Classname FileType
@@ -47,49 +55,37 @@ public class FileTypeUtils {
      Windows Media (asf)，文件头：3026B2758E66CF11
      MIDI (mid)，文件头：4D546864
      */
-    public static String checkType(String xxxx) {
-
-        switch (xxxx) {
-            case "FFD8FF": return "jpg";
-            case "89504E": return "png";
-            case "474946": return "jif";
-
-            default: return "0000";
+    public static String checkType(File file) {
+        String type = FileTypeUtil.getType(file,false);
+        if (type != null){
+            return "."+type;
         }
-    }
+
+        Tika tika = new Tika();
+        MimeTypes mimeTypes = MimeTypes.getDefaultMimeTypes();
 
 
-    public static String bytesToHexString(byte[] src) {
-        StringBuilder stringBuilder = new StringBuilder();
-        if (src == null || src.length <= 0) {
+        String mimeType = null;
+        try {
+            mimeType = tika.detect(file);
+        } catch (IOException e) {
             return null;
         }
-        for (int i = 0; i < src.length; i++) {
-            int v = src[i] & 0xFF;
-            String hv = Integer.toHexString(v);
-            if (hv.length() < 2) {
-                stringBuilder.append(0);
-            }
-            stringBuilder.append(hv);
+        MimeType forName = null;
+        try {
+            forName = mimeTypes.forName(mimeType);
+        } catch (MimeTypeException e) {
+            return null;
         }
-        return stringBuilder.toString();
-    }
+        String extension = forName.getExtension();
+        if (extension .contains("mpga")){
+            return ".mp3";
+        }
+        return extension;
 
-    /**
-     * 根据文件获取后缀
-     * @param file 文件
-     */
-    public static String getFileSuffix(File file) throws Exception {
-        FileInputStream is = new FileInputStream(file);
-        byte[] b = new byte[3];
-        is.read(b, 0, b.length);
-        String x64 = bytesToHexString(b);
-        x64 = x64.toUpperCase();
-//        System.out.println("头文件是：" + x64);
-        String suffix = checkType(x64);
-//        System.out.println("后缀名是：" + suffix);
-        return suffix;
 
     }
+
+
 
 }

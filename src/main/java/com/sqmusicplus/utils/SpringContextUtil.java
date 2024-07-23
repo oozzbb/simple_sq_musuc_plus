@@ -16,10 +16,6 @@ import java.util.Map;
  * <p>
  *     <br/>Spring上下文工具类
  * </p>
- * @author daijiang@hopechart.com
- * @date 2018-01-24 15:05:52
- * @copyright 杭州鸿泉物联网技术股份有限公司
- * @version V1.0.0
  */
 @Component
 @Lazy(false)

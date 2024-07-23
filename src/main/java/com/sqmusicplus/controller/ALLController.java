@@ -3,6 +3,7 @@ package com.sqmusicplus.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sqmusicplus.base.entity.*;
 import com.sqmusicplus.base.entity.vo.*;
@@ -13,6 +14,7 @@ import com.sqmusicplus.parser.UrlMusicPlayListParser;
 import com.sqmusicplus.plug.base.PlugBrType;
 import com.sqmusicplus.plug.base.hander.SearchHanderAbstract;
 import com.sqmusicplus.plug.entity.*;
+import com.sqmusicplus.plug.freemp3.hander.FreeMp3Hander;
 import com.sqmusicplus.plug.kw.hander.NKwSearchHander;
 import com.sqmusicplus.plug.mg.hander.MgHander;
 import com.sqmusicplus.plug.netease.hander.NeteaseHander;
@@ -20,6 +22,7 @@ import com.sqmusicplus.plug.qq.hander.QQHander;
 import com.sqmusicplus.plug.utils.TypeUtils;
 import com.sqmusicplus.base.service.SqConfigService;
 import com.sqmusicplus.utils.MusicUtils;
+import com.sqmusicplus.utils.OkHttpUtils;
 import com.sqmusicplus.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +31,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
 
 
+import javax.validation.Valid;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created with IntelliJ IDEA.
@@ -47,14 +49,6 @@ import java.util.stream.Collectors;
 @RequestMapping()
 public class ALLController {
     @Autowired
-    private MgHander mgHander;
-    @Autowired
-    private NKwSearchHander kwHander;
-    @Autowired
-    private QQHander qqHander;
-    @Autowired
-    private NeteaseHander neteaseHander;
-    @Autowired
     @Qualifier("threadPoolTaskExecutor")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     @Autowired
@@ -66,6 +60,10 @@ public class ALLController {
 
     @Autowired
     private DownloadInfoService downloadInfoService;
+    @Autowired
+    List<SearchHanderAbstract> searchHanderAbstractList;
+    @Autowired
+    private FreeMp3Hander freeMp3Hander;
 
 
 
@@ -83,60 +81,60 @@ public class ALLController {
     @GetMapping("/searchMusic/{searchType}/{keyword}/{pageSize}/{pageIndex}")
     public AjaxResult searchMusic(@PathVariable("searchType") String searchType,@PathVariable("keyword") String keyword,@PathVariable("pageSize") Integer pageSize,@PathVariable("pageIndex") Integer pageIndex ){
 
-        if(searchType.equals(PlugBrType.KW_FLAC_2000.getPlugName())){
-            SearchKeyData searchKeyData = new SearchKeyData().setPageIndex(pageIndex - 1).setPageSize(pageSize).setSearchkey(keyword).setSearchType(searchType);
-            PlugSearchResult<PlugSearchMusicResult> plugSearchMusicResultPlugSearchResult = kwHander.querySongByName(searchKeyData);
-            return AjaxResult.success(plugSearchMusicResultPlugSearchResult);
-        }else if (searchType.equals(PlugBrType.MG_FLAC_2000.getPlugName())){
-            SearchKeyData searchKeyData = new SearchKeyData().setPageIndex(pageIndex - 1).setPageSize(pageSize).setSearchkey(keyword).setSearchType(searchType);
-            PlugSearchResult<PlugSearchMusicResult> plugSearchMusicResultPlugSearchResult = mgHander.querySongByName(searchKeyData);
-            return AjaxResult.success(plugSearchMusicResultPlugSearchResult);
-        }else if (searchType.equals(PlugBrType.QQ_Flac_2000.getPlugName())){
-            SearchKeyData searchKeyData = new SearchKeyData().setPageIndex(pageIndex).setPageSize(pageSize).setSearchkey(keyword).setSearchType(searchType);
-            PlugSearchResult<PlugSearchMusicResult> plugSearchMusicResultPlugSearchResult = qqHander.querySongByName(searchKeyData);
-            return AjaxResult.success(plugSearchMusicResultPlugSearchResult);
-        }else if (searchType.equals(PlugBrType.NETEASE_FLAC_2000.getPlugName())){
-            SearchKeyData searchKeyData = new SearchKeyData().setPageIndex(pageIndex).setPageSize(pageSize).setSearchkey(keyword).setSearchType(searchType);
-            PlugSearchResult<PlugSearchMusicResult> plugSearchMusicResultPlugSearchResult = neteaseHander.querySongByName(searchKeyData);
-            return AjaxResult.success(plugSearchMusicResultPlugSearchResult);
+        SearchHanderAbstract searchHanderAbstract = null;
+        for (SearchHanderAbstract item : searchHanderAbstractList) {
+            if(item.getPlugName().equals(searchType)){
+                searchHanderAbstract = item;
+            }
         }
-        return AjaxResult.error("未知的搜索类型");
+        if (searchHanderAbstract==null){
+            return AjaxResult.error("未知的搜索类型");
+        }
+        SearchKeyData searchKeyData = new SearchKeyData().setPageIndex(pageIndex).setPageSize(pageSize).setSearchkey(keyword).setSearchType(searchType);
+        PlugSearchResult<PlugSearchMusicResult> plugSearchMusicResultPlugSearchResult = searchHanderAbstract.querySongByName(searchKeyData);
+        return AjaxResult.success(plugSearchMusicResultPlugSearchResult);
+
     }
     @SaCheckLogin
     @GetMapping("/musicUrl/{searchType}/{id}")
     public AjaxResult getPlayMusicUrl(@PathVariable("searchType") String searchType,@PathVariable("id")String id){
-        if(searchType.equals(PlugBrType.KW_FLAC_2000.getPlugName())){
-            HashMap<String, String> downloadUrl = kwHander.getDownloadUrl(id, PlugBrType.KW_FLAC_2000);
-            return AjaxResult.success(downloadUrl);
-        }else if (searchType.equals(PlugBrType.MG_FLAC_2000.getPlugName())){
-            HashMap<String, String> downloadUrl = mgHander.getDownloadUrl(id, PlugBrType.MG_FLAC_2000);
-            return AjaxResult.success(downloadUrl);
-        }else if (searchType.equals(PlugBrType.QQ_Flac_2000.getPlugName())){
-            HashMap<String, String> downloadUrl = qqHander.getDownloadUrl(id, PlugBrType.QQ_Flac_2000);
-            return AjaxResult.success(downloadUrl);
-        }else if (searchType.equals(PlugBrType.NETEASE_FLAC_2000.getPlugName())){
-            HashMap<String, String> downloadUrl = neteaseHander.getDownloadUrl(id, PlugBrType.NETEASE_FLAC_3000);
-            return AjaxResult.success(downloadUrl);
+        SearchHanderAbstract searchHanderAbstract = null;
+        for (SearchHanderAbstract item : searchHanderAbstractList) {
+            if(item.getPlugName().equals(searchType)){
+                searchHanderAbstract = item;
+            }
         }
-        return AjaxResult.error("未知的搜索类型");
+        if (searchHanderAbstract==null){
+            return AjaxResult.error("未知的搜索类型");
+        }
+
+        PlugBrType plugType;
+        if (StringUtils.isEmpty(searchType)){
+            plugType = TypeUtils.getPlugType(searchType);
+        }else{
+            plugType = TypeUtils.getPlugType(searchType);
+        }
+        PlugBrType finalPlugType = plugType;
+
+        HashMap<String, String> downloadUrl = searchHanderAbstract.getDownloadUrl(id, finalPlugType);
+        return AjaxResult.success(downloadUrl);
+
     }
     @SaCheckLogin
     @GetMapping("/SongInfoById/{searchType}/{id}")
     public AjaxResult SongInfoById(@PathVariable("searchType") String searchType,@PathVariable("id")String id){
-        if(searchType.equals(PlugBrType.KW_FLAC_2000.getPlugName())){
-            Music music = kwHander.querySongById(id);
-            return AjaxResult.success(music);
-        }else if (searchType.equals(PlugBrType.MG_FLAC_2000.getPlugName())){
-            Music music = mgHander.querySongById(id);
-            return AjaxResult.success(music);
-        }else if (searchType.equals(PlugBrType.QQ_Flac_2000.getPlugName())){
-            Music music = qqHander.querySongById(id);
-            return AjaxResult.success(music);
-        }else if (searchType.equals(PlugBrType.NETEASE_FLAC_2000.getPlugName())){
-            Music music = neteaseHander.querySongById(id);
-            return AjaxResult.success(music);
+        SearchHanderAbstract searchHanderAbstract = null;
+        for (SearchHanderAbstract item : searchHanderAbstractList) {
+            if(item.getPlugName().equals(searchType)){
+                searchHanderAbstract = item;
+            }
         }
-        return AjaxResult.error("未知的搜索类型");
+        if (searchHanderAbstract==null){
+            return AjaxResult.error("未知的搜索类型");
+        }
+        Music music = searchHanderAbstract.querySongById(id);
+        return AjaxResult.success(music);
+
     }
 
 
@@ -149,6 +147,18 @@ public class ALLController {
     @SaCheckLogin
     @PostMapping("/musicDownload")
     public AjaxResult musicDownload( @RequestBody DownloadSongEntity downloadSong) {
+
+        SearchHanderAbstract searchHanderAbstract = null;
+        for (SearchHanderAbstract item : searchHanderAbstractList) {
+            if(item.getPlugName().equals(downloadSong.getPlugType())){
+                searchHanderAbstract = item;
+            }
+        }
+        if (searchHanderAbstract==null){
+            return AjaxResult.error("未知的搜索类型");
+        }
+
+
         String searchType = downloadSong.getPlugType();
         PlugBrType plugType;
         if (StringUtils.isEmpty(downloadSong.getPlugTypeValue())){
@@ -158,17 +168,7 @@ public class ALLController {
         }
         PlugBrType finalPlugType = plugType;
         Music music =null;
-        if (searchType.equals(PlugBrType.KW_FLAC_2000.getPlugName())){
-                music = kwHander.querySongById(downloadSong.getId());
-        }else if (searchType.equals(PlugBrType.MG_FLAC_2000.getPlugName())){
-                music = mgHander.querySongById(downloadSong.getId());
-        }else if (searchType.equals(PlugBrType.QQ_Flac_2000.getPlugName())){
-            music = qqHander.querySongById(downloadSong.getId());
-        }else if (searchType.equals(PlugBrType.NETEASE_FLAC_2000.getPlugName())){
-            music = neteaseHander.querySongById(downloadSong.getId());
-        }
-
-
+        music = searchHanderAbstract.querySongById(downloadSong.getId());
         Music finalMusic = music;
             DownloadInfo downloadInfo = new DownloadInfo().setDownloadMusicId(finalMusic.getId())
                     .setDownloadBrType(finalPlugType.getValue())
@@ -181,9 +181,11 @@ public class ALLController {
                     .setDownloadType(searchType)
                     .setDownloadTime(new Date());
             Boolean add = downloadInfoService.add(downloadInfo);
-
-
         return AjaxResult.success(add);
+
+
+
+
     }
 
     /**
@@ -196,25 +198,19 @@ public class ALLController {
     @SaCheckLogin
     @GetMapping("/searchArtist/{searchType}/{keyword}/{pageSize}/{pageIndex}")
     public AjaxResult searchArtist(@PathVariable("searchType") String searchType,@PathVariable("keyword") String keyword,@PathVariable("pageSize") Integer pageSize,@PathVariable("pageIndex") Integer pageIndex ){
-        if (searchType.equals(PlugBrType.KW_FLAC_2000.getPlugName())){
-            SearchKeyData searchKeyData = new SearchKeyData().setSearchkey(keyword).setPageSize(pageSize).setPageIndex(pageIndex - 1).setSearchType(searchType);
-            PlugSearchResult<PlugSearchArtistResult> plugSearchArtistResultPlugSearchResult = kwHander.queryArtistByName(searchKeyData);
-            return AjaxResult.success(plugSearchArtistResultPlugSearchResult);
-        }else if (searchType.equals(PlugBrType.MG_FLAC_2000.getPlugName())){
-            SearchKeyData searchKeyData = new SearchKeyData().setSearchkey(keyword).setPageSize(pageSize).setPageIndex(pageIndex - 1).setSearchType(searchType);
-            PlugSearchResult<PlugSearchArtistResult> plugSearchArtistResultPlugSearchResult = mgHander.queryArtistByName(searchKeyData);
-            return AjaxResult.success(plugSearchArtistResultPlugSearchResult);
-        } else if (searchType.equals(PlugBrType.QQ_Flac_2000.getPlugName())){
-            SearchKeyData searchKeyData = new SearchKeyData().setSearchkey(keyword).setPageSize(pageSize).setPageIndex(pageIndex - 1).setSearchType(searchType);
-            PlugSearchResult<PlugSearchArtistResult> plugSearchArtistResultPlugSearchResult = qqHander.queryArtistByName(searchKeyData);
-            return AjaxResult.success(plugSearchArtistResultPlugSearchResult);
-        }else if (searchType.equals(PlugBrType.NETEASE_FLAC_2000.getPlugName())){
-            SearchKeyData searchKeyData = new SearchKeyData().setSearchkey(keyword).setPageSize(pageSize).setPageIndex(pageIndex).setSearchType(searchType);
-            PlugSearchResult<PlugSearchArtistResult> plugSearchArtistResultPlugSearchResult = neteaseHander.queryArtistByName(searchKeyData);
-            return AjaxResult.success(plugSearchArtistResultPlugSearchResult);
+        SearchHanderAbstract searchHanderAbstract = null;
+        for (SearchHanderAbstract item : searchHanderAbstractList) {
+            if(item.getPlugName().equals(searchType)){
+                searchHanderAbstract = item;
+            }
+        }
+        if (searchHanderAbstract==null){
+            return AjaxResult.error("未知的搜索类型");
         }
 
-        return AjaxResult.error("未知的搜索类型");
+        SearchKeyData searchKeyData = new SearchKeyData().setSearchkey(keyword).setPageSize(pageSize).setPageIndex(pageIndex).setSearchType(searchType);
+        PlugSearchResult<PlugSearchArtistResult> plugSearchArtistResultPlugSearchResult = searchHanderAbstract.queryArtistByName(searchKeyData);
+        return AjaxResult.success(plugSearchArtistResultPlugSearchResult);
     }
     /**
      * 下载歌手全部专辑歌曲到服务器
@@ -224,6 +220,18 @@ public class ALLController {
     @SaCheckLogin
     @PostMapping("/ArtistDownload")
     public AjaxResult ArtistDownload(@RequestBody DownlaodArtis downlaodAlubm){
+        SearchHanderAbstract searchHanderAbstract = null;
+        for (SearchHanderAbstract item : searchHanderAbstractList) {
+            if(item.getPlugName().equals(downlaodAlubm.getPlugType())){
+                searchHanderAbstract = item;
+            }
+        }
+        if (searchHanderAbstract==null){
+            return AjaxResult.error("未知的搜索类型");
+        }
+
+
+        SearchHanderAbstract finalSearchHanderAbstract = searchHanderAbstract;
         threadPoolTaskExecutor.execute(()->{
             PlugBrType plugType;
             if (StringUtils.isEmpty(downlaodAlubm.getPlugTypeValue())){
@@ -233,17 +241,7 @@ public class ALLController {
             }
             PlugBrType finalPlugType = plugType;
             List<DownloadEntity> downloadEntities =null;
-            if (downlaodAlubm.getPlugType().equals(PlugBrType.KW_FLAC_2000.getPlugName())){
-                downloadEntities= kwHander.downloadArtistAllAlbum(downlaodAlubm.getId(), finalPlugType, null);
-
-            }else if(downlaodAlubm.getPlugType().equals(PlugBrType.MG_FLAC_2000.getPlugName())){
-                downloadEntities =  mgHander.downloadArtistAllAlbum(downlaodAlubm.getId(), finalPlugType, null);
-            }
-            else if(downlaodAlubm.getPlugType().equals(PlugBrType.QQ_Flac_2000.getPlugName())){
-                downloadEntities =  qqHander.downloadArtistAllAlbum(downlaodAlubm.getId(), finalPlugType, null);
-            }else if(downlaodAlubm.getPlugType().equals(PlugBrType.NETEASE_FLAC_2000.getPlugName())){
-                downloadEntities =  neteaseHander.downloadArtistAllAlbum(downlaodAlubm.getId(), finalPlugType, null);
-            }
+            downloadEntities =  finalSearchHanderAbstract.downloadArtistAllAlbum(downlaodAlubm.getId(), finalPlugType, null);
             List<DownloadInfo> downloadInfos = MusicUtils.downloadEntitytoDownloadInfoTo(downloadEntities);
             downloadInfoService.add(downloadInfos);
         });
@@ -260,24 +258,19 @@ public class ALLController {
     @SaCheckLogin
     @GetMapping("/searchAlbum/{searchType}/{keyword}/{pageSize}/{pageIndex}")
     public AjaxResult searchAlbum(@PathVariable("searchType") String searchType,@PathVariable("keyword") String keyword,@PathVariable("pageSize") Integer pageSize,@PathVariable("pageIndex") Integer pageIndex ){
-        SearchKeyData searchKeyData = new SearchKeyData().setSearchkey(keyword).setPageSize(pageSize).setPageIndex(pageIndex - 1).setSearchType(searchType);
-
-        if (searchType.equals(PlugBrType.KW_FLAC_2000.getPlugName())){
-            PlugSearchResult<PlugSearchAlbumResult> plugSearchAlbumResultPlugSearchResult = kwHander.queryAlbumByName(searchKeyData);
-            return AjaxResult.success(plugSearchAlbumResultPlugSearchResult);
-        }else if (searchType.equals(PlugBrType.MG_FLAC_2000.getPlugName())){
-            PlugSearchResult<PlugSearchAlbumResult> plugSearchAlbumResultPlugSearchResult = mgHander.queryAlbumByName(searchKeyData);
-            return AjaxResult.success(plugSearchAlbumResultPlugSearchResult);
-        }else if (searchType.equals(PlugBrType.QQ_Flac_2000.getPlugName())){
-            searchKeyData = new SearchKeyData().setSearchkey(keyword).setPageSize(pageSize).setPageIndex(pageIndex).setSearchType(searchType);
-            PlugSearchResult<PlugSearchAlbumResult> plugSearchAlbumResultPlugSearchResult = qqHander.queryAlbumByName(searchKeyData);
-            return AjaxResult.success(plugSearchAlbumResultPlugSearchResult);
-        }else if (searchType.equals(PlugBrType.NETEASE_FLAC_2000.getPlugName())){
-            searchKeyData = new SearchKeyData().setSearchkey(keyword).setPageSize(pageSize).setPageIndex(pageIndex).setSearchType(searchType);
-            PlugSearchResult<PlugSearchAlbumResult> plugSearchAlbumResultPlugSearchResult = neteaseHander.queryAlbumByName(searchKeyData);
-            return AjaxResult.success(plugSearchAlbumResultPlugSearchResult);
+        SearchHanderAbstract searchHanderAbstract = null;
+        for (SearchHanderAbstract item : searchHanderAbstractList) {
+            if(item.getPlugName().equals(searchType)){
+                searchHanderAbstract = item;
+            }
         }
-        return AjaxResult.error("未知的搜索类型");
+        if (searchHanderAbstract==null){
+            return AjaxResult.error("未知的搜索类型");
+        }
+        SearchKeyData searchKeyData = new SearchKeyData().setSearchkey(keyword).setPageSize(pageSize).setPageIndex(pageIndex - 1).setSearchType(searchType);
+        searchKeyData = new SearchKeyData().setSearchkey(keyword).setPageSize(pageSize).setPageIndex(pageIndex).setSearchType(searchType);
+        PlugSearchResult<PlugSearchAlbumResult> plugSearchAlbumResultPlugSearchResult = searchHanderAbstract.queryAlbumByName(searchKeyData);
+        return AjaxResult.success(plugSearchAlbumResultPlugSearchResult);
 
     }
     /**
@@ -288,6 +281,16 @@ public class ALLController {
     @SaCheckLogin
     @PostMapping("/AlbumDownload")
     public AjaxResult AlbumDownload(@RequestBody DownlaodAlubm downlaodAlubm){
+        SearchHanderAbstract searchHanderAbstract = null;
+        for (SearchHanderAbstract item : searchHanderAbstractList) {
+            if(item.getPlugName().equals(downlaodAlubm.getPlugType())){
+                searchHanderAbstract = item;
+            }
+        }
+        if (searchHanderAbstract==null){
+            return AjaxResult.error("未知的搜索类型");
+        }
+
         PlugBrType plugType;
         if (StringUtils.isEmpty(downlaodAlubm.getPlugTypeValue())){
             plugType = TypeUtils.getPlugType(downlaodAlubm.getPlugType(), downlaodAlubm.getBr());
@@ -296,15 +299,7 @@ public class ALLController {
         }
         PlugBrType finalPlugType = plugType;
         ArrayList<DownloadEntity> downloadEntities = null;
-        if (downlaodAlubm.getPlugType().equals(PlugBrType.KW_FLAC_2000.getPlugName())){
-            downloadEntities =  kwHander.downloadAlbum(downlaodAlubm.getId(), finalPlugType, downlaodAlubm.getSubsonicPlayListName(), "", false, "");
-        }else if(downlaodAlubm.getPlugType().equals(PlugBrType.MG_FLAC_2000.getPlugName())){
-            downloadEntities =  mgHander.downloadAlbum(downlaodAlubm.getId(), finalPlugType, downlaodAlubm.getSubsonicPlayListName(), "", false, "");
-        }else if(downlaodAlubm.getPlugType().equals(PlugBrType.QQ_Flac_2000.getPlugName())){
-            downloadEntities =  qqHander.downloadAlbum(downlaodAlubm.getId(), finalPlugType, downlaodAlubm.getSubsonicPlayListName(), "", false, "");
-        }else if(downlaodAlubm.getPlugType().equals(PlugBrType.NETEASE_FLAC_2000.getPlugName())){
-            downloadEntities =  neteaseHander.downloadAlbum(downlaodAlubm.getId(), finalPlugType, downlaodAlubm.getSubsonicPlayListName(), "", false, "");
-        }
+        downloadEntities =  searchHanderAbstract.downloadAlbum(downlaodAlubm.getId(), finalPlugType, downlaodAlubm.getSubsonicPlayListName(), "", false, "");
         List<DownloadInfo> downloadInfos = MusicUtils.downloadEntitytoDownloadInfoTo(downloadEntities);
         downloadInfoService.add(downloadInfos);
         return AjaxResult.success(true);
@@ -353,72 +348,79 @@ public class ALLController {
     @SaCheckLogin
     @PostMapping("/downloadParser")
     public AjaxResult downloadParser(@RequestBody DownlaodParserText data) throws IOException {
+
+        SearchHanderAbstract searchHanderAbstract = null;
+        for (SearchHanderAbstract item : searchHanderAbstractList) {
+            if (StringUtils.isEmpty(data.getPlugType())) {
+                data.setPlugType("kw");
+            }
+            if(item.getPlugName().equals(data.getPlugType())){
+                searchHanderAbstract = item;
+            }
+        }
+        if (searchHanderAbstract==null){
+            return AjaxResult.error("未知的搜索类型");
+        }
+
         String text = data.getText();
 
         String subsonicPlayListName = data.getSubsonicPlayListName();
         List<ParserEntity> parser = textMusicPlayListParser.parser(text);
+        SearchHanderAbstract finalSearchHanderAbstract = searchHanderAbstract;
         threadPoolTaskExecutor.execute(()->{
             for (ParserEntity parserEntity : parser) {
                 try {
                 PlugSearchResult<PlugSearchMusicResult> plugSearchMusicResultPlugSearchResult = null;
-                    plugSearchMusicResultPlugSearchResult = kwHander.querySongByName(new SearchKeyData().setSearchkey(parserEntity.getSongName() + " " + parserEntity.getArtistsName()).setPageIndex(0).setPageSize(5));
+                    plugSearchMusicResultPlugSearchResult = finalSearchHanderAbstract.querySongByName(new SearchKeyData().setSearchkey(parserEntity.getSongName() + " " + parserEntity.getArtistsName()).setPageIndex(0).setPageSize(5));
                     String id = "";
                     Music music =null;
                     List<PlugSearchMusicResult> records = plugSearchMusicResultPlugSearchResult.getRecords();
                     for (PlugSearchMusicResult record : records) {
                         if (parserEntity.getArtistsName().trim().equals(record.getArtistName().trim())){
                              id = record.getId();
-                             music = kwHander.querySongById(id);
+                             music = finalSearchHanderAbstract.querySongById(id);
                              break;
                         }
                     }
-                    if (music!=null){
+
+                    if (music==null){
+                        List<SearchHanderAbstract> searchHanderAbstracts = sortHander(searchHanderAbstractList);
+                        for (SearchHanderAbstract handerAbstract : searchHanderAbstracts) {
+                            plugSearchMusicResultPlugSearchResult = handerAbstract.querySongByName(new SearchKeyData().setSearchkey(parserEntity.getSongName() + " " + parserEntity.getArtistsName()).setPageIndex(0).setPageSize(5));
+
+                            List<PlugSearchMusicResult> records1 = plugSearchMusicResultPlugSearchResult.getRecords();
+                            for (PlugSearchMusicResult record : records1) {
+                                if (parserEntity.getArtistsName().trim().equals(record.getArtistName().trim())){
+                                    id = record.getId();
+                                    music = finalSearchHanderAbstract.querySongById(id);
+                                    break;
+                                }
+                            }
+
+                        }
+                        if (music==null){
+                            return;
+                        }
+
+
+                    }else{
                         //成功了
                         Music finalMusic = music;
                         music.setMusicArtists(parserEntity.getArtistsName());
-                            DownloadInfo downloadInfo = new DownloadInfo().setDownloadMusicId(finalMusic.getId())
-                                    .setDownloadBrType(PlugBrType.KW_FLAC_2000.getValue())
-                                    .setDownloadMusicname(finalMusic.getMusicName())
-                                    .setDownloadArtistname(finalMusic.getMusicArtists())
-                                    .setDownloadAlbumname(finalMusic.getMusicAlbum())
-                                    .setAudioBook("false")
-                                    .setAddSubsonicPlayListName(subsonicPlayListName)
-                                    .setSpringName(PlugBrType.KW_FLAC_2000.getSpringName())
-                                    .setDownloadType(PlugBrType.KW_FLAC_2000.getPlugName())
-                                    .setDownloadTime(new Date());
-                            Boolean add = downloadInfoService.add(downloadInfo);
-                    }else {
-                        plugSearchMusicResultPlugSearchResult = neteaseHander.querySongByName(new SearchKeyData().setSearchkey(parserEntity.getSongName() + " " + parserEntity.getArtistsName()).setPageIndex(0).setPageSize(5));
-                         id = "";
-                         music =null;
-                        records = plugSearchMusicResultPlugSearchResult.getRecords();
-                        for (PlugSearchMusicResult record : records) {
-                            if (parserEntity.getArtistsName().trim().equals(record.getArtistName().trim())){
-                                id = record.getId();
-                                music = neteaseHander.querySongById(id);
-                                break;
-                            }
-                        }
-                        if (music!=null){
-                            //成功了
-                            Music finalMusic = music;
-                            music.setMusicArtists(parserEntity.getArtistsName());
-                            DownloadInfo downloadInfo = new DownloadInfo().setDownloadMusicId(finalMusic.getId())
-                                    .setDownloadBrType(PlugBrType.NETEASE_FLAC_3000.getValue())
-                                    .setDownloadMusicname(finalMusic.getMusicName())
-                                    .setDownloadArtistname(finalMusic.getMusicArtists())
-                                    .setDownloadAlbumname(finalMusic.getMusicAlbum())
-                                    .setAudioBook("false")
-                                    .setAddSubsonicPlayListName(subsonicPlayListName)
-                                    .setSpringName(PlugBrType.NETEASE_FLAC_3000.getSpringName())
-                                    .setDownloadType(PlugBrType.NETEASE_FLAC_3000.getPlugName())
-                                    .setDownloadTime(new Date());
-                            Boolean add = downloadInfoService.add(downloadInfo);
-                        }else{
-                            log.error("没有查询到歌曲：" + parserEntity);
-                        }
-
+                        DownloadInfo downloadInfo = new DownloadInfo().setDownloadMusicId(finalMusic.getId())
+                                .setDownloadBrType(PlugBrType.KW_FLAC_2000.getValue())
+                                .setDownloadMusicname(finalMusic.getMusicName())
+                                .setDownloadArtistname(finalMusic.getMusicArtists())
+                                .setDownloadAlbumname(finalMusic.getMusicAlbum())
+                                .setAudioBook("false")
+                                .setAddSubsonicPlayListName(subsonicPlayListName)
+                                .setSpringName(PlugBrType.KW_FLAC_2000.getSpringName())
+                                .setDownloadType(PlugBrType.KW_FLAC_2000.getPlugName())
+                                .setDownloadTime(new Date());
+                        Boolean add = downloadInfoService.add(downloadInfo);
                     }
+
+
                 } catch (Exception e) {
                     log.error("没有查询出错：" + parserEntity+"  "+e.getMessage());
                     continue;
@@ -431,70 +433,31 @@ public class ALLController {
     @SaCheckLogin
     @PostMapping("/ArtistSongList")
     public AjaxResult ArtistSongList(@RequestBody DownlaodArtis downlaodArtis) {
-        SqConfig accompaniment = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.ignore.accompaniment"));
-            if (downlaodArtis.getPlugType().equals(PlugBrType.KW_FLAC_2000.getPlugName())){
-                List<Music> musics = kwHander.queryAllArtistSongList(downlaodArtis.getId(), 1000, 0);
-                ArrayList<DownloadInfo> downloadInfos = new ArrayList<>();
-                for (Music music : musics) {
-                    if (Boolean.getBoolean(accompaniment.getConfigValue())) {
-                        if (music.getMusicName().contains("(伴奏)") || music.getMusicName().contains("(试听版)") || music.getMusicName().contains("(片段)")) {
-                            continue;
-                        }
-                    }
-                    DownloadEntity downloadEntity = kwHander.downloadSong(music, PlugBrType.KW_FLAC_2000, "");
-                    DownloadInfo downloadInfo = MusicUtils.downloadEntitytoDownloadInfoTo(downloadEntity);
-                    downloadInfos.add(downloadInfo);
-                }
-                downloadInfoService.add(downloadInfos);
-                return AjaxResult.success(true);
-            }else if (downlaodArtis.getPlugType().equals(PlugBrType.MG_FLAC_2000.getPlugName())){
-                List<Music> musics = mgHander.getAlbumSongByAlbumsId(downlaodArtis.getId());
-                ArrayList<DownloadInfo> downloadInfos = new ArrayList<>();
-                for (Music music : musics) {
-                    if (Boolean.getBoolean(accompaniment.getConfigValue())) {
-                        if (music.getMusicName().contains("(伴奏)") || music.getMusicName().contains("(试听版)") || music.getMusicName().contains("(片段)")) {
-                            continue;
-                        }
-                    }
-                    DownloadEntity downloadEntity = mgHander.downloadSong(music, PlugBrType.MG_FLAC_2000, "");
-                    DownloadInfo downloadInfo = MusicUtils.downloadEntitytoDownloadInfoTo(downloadEntity);
-                    downloadInfos.add(downloadInfo);
-                }
-                downloadInfoService.add(downloadInfos);
-            return AjaxResult.success(true);
-        }else if (downlaodArtis.getPlugType().equals(PlugBrType.QQ_Flac_2000.getPlugName())){
-                List<Music> musics = qqHander.getAlbumSongByAlbumsId(downlaodArtis.getId());
-                ArrayList<DownloadInfo> downloadInfos = new ArrayList<>();
-                for (Music music : musics) {
-                    if (Boolean.getBoolean(accompaniment.getConfigValue())) {
-                        if (music.getMusicName().contains("(伴奏)") || music.getMusicName().contains("(试听版)") || music.getMusicName().contains("(片段)")) {
-                            continue;
-                        }
-                    }
-                    DownloadEntity downloadEntity = qqHander.downloadSong(music, PlugBrType.QQ_Flac_2000, "");
-                    DownloadInfo downloadInfo = MusicUtils.downloadEntitytoDownloadInfoTo(downloadEntity);
-                    downloadInfos.add(downloadInfo);
-                }
-                downloadInfoService.add(downloadInfos);
-                return AjaxResult.success(true);
-            }else if (downlaodArtis.getPlugType().equals(PlugBrType.NETEASE_FLAC_2000.getPlugName())){
-                List<Music> musics = neteaseHander.getAlbumSongByAlbumsId(downlaodArtis.getId());
-                ArrayList<DownloadInfo> downloadInfos = new ArrayList<>();
-                for (Music music : musics) {
-                    if (Boolean.getBoolean(accompaniment.getConfigValue())) {
-                        if (music.getMusicName().contains("(伴奏)") || music.getMusicName().contains("(试听版)") || music.getMusicName().contains("(片段)")) {
-                            continue;
-                        }
-                    }
-                    DownloadEntity downloadEntity = neteaseHander.downloadSong(music, PlugBrType.NETEASE_FLAC_3000, "");
-                    DownloadInfo downloadInfo = MusicUtils.downloadEntitytoDownloadInfoTo(downloadEntity);
-                    downloadInfos.add(downloadInfo);
-                }
-                downloadInfoService.add(downloadInfos);
-                return AjaxResult.success(true);
-            }else{
-            return AjaxResult.error("不支持");
+
+        SearchHanderAbstract searchHanderAbstract = null;
+        for (SearchHanderAbstract item : searchHanderAbstractList) {
+            if(item.getPlugName().equals(downlaodArtis.getPlugType())){
+                searchHanderAbstract = item;
+            }
         }
+        if (searchHanderAbstract==null){
+            return AjaxResult.error("未知的搜索类型");
+        }
+        SqConfig accompaniment = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.ignore.accompaniment"));
+        List<Music> musics = searchHanderAbstract.getAlbumSongByAlbumsId(downlaodArtis.getId());
+        ArrayList<DownloadInfo> downloadInfos = new ArrayList<>();
+        for (Music music : musics) {
+            if (Boolean.getBoolean(accompaniment.getConfigValue())) {
+                if (music.getMusicName().contains("(伴奏)") || music.getMusicName().contains("(试听版)") || music.getMusicName().contains("(片段)")) {
+                    continue;
+                }
+            }
+            DownloadEntity downloadEntity = searchHanderAbstract.downloadSong(music, PlugBrType.KW_FLAC_2000, "");
+            DownloadInfo downloadInfo = MusicUtils.downloadEntitytoDownloadInfoTo(downloadEntity);
+            downloadInfos.add(downloadInfo);
+        }
+        downloadInfoService.add(downloadInfos);
+        return AjaxResult.success(true);
     }
 
 
@@ -528,6 +491,70 @@ public class ALLController {
     @RequestMapping(value = "isLogin")
     public AjaxResult isLogin() {
         return  StpUtil.isLogin()?AjaxResult.success("登录有效",true):AjaxResult.error("过期",false);
+    }
+
+
+    public static List<SearchHanderAbstract>  sortHander( List<SearchHanderAbstract> list) {
+        List<String> targetList = Arrays.asList("kw", "netease", "qq", "qqvip");
+        List<SearchHanderAbstract> clone = ObjectUtil.clone(list);
+        // 按照 list 里的 name 来排序 targetList
+        Collections.sort(clone, ((o1, o2) -> {
+            int io1 = targetList.indexOf(o1.getPlugName());
+            int io2 = targetList.indexOf(o2.getPlugName());
+
+            if (io1 != -1) {
+                io1 = targetList.size() - io1;
+            }
+            if (io2 != -1) {
+                io2 = targetList.size() - io2;
+            }
+
+            return io2 - io1;
+        }));
+        return clone ;
+    }
+
+
+//    @SaCheckLogin
+    @PostMapping("/download/freemp3")
+    public String freemp3Download(@Valid  @RequestBody PlugFreeMp3DownloadEntity data) throws Exception {
+
+        String downloadurl = data.getDownloadurl();
+        String redirectUrl = OkHttpUtils.getRedirectUrl(downloadurl);
+        String[] split = data.getMusicname().split("-");
+        String musicName = null;
+        try {
+            musicName = split[0].trim();
+        } catch (Exception e) {
+            musicName = data.getMusicname();
+        }
+
+        String artistName = null;
+        if (StringUtils.isBlank(data.getMusicartistName())){
+            try {
+                artistName = split[1].trim();
+            } catch (Exception e) {
+                artistName="";
+            }
+        }else{
+            artistName = data.getMusicartistName();
+        }
+        String musicalbumName = data.getMusicalbumName();
+        if (StringUtils.isBlank(musicalbumName)){
+            //网易喜欢搞这种的  酷我是无专辑大户
+            musicalbumName = musicName;
+        }
+
+        String finalMusicName = musicName;
+        String finalArtistName = artistName;
+        String finalMusicalbumName = musicalbumName;
+        threadPoolTaskExecutor.execute(() -> {
+            DownloadEntity download = freeMp3Hander.download(finalMusicName, finalArtistName, finalMusicalbumName, data.getMusiclyrc(), data.getMusicimage(), redirectUrl);
+            downloadInfoService.add(MusicUtils.downloadEntitytoDownloadInfoTo(download));
+        });
+
+
+        return redirectUrl;
     }
 
 }

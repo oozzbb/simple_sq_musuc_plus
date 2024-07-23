@@ -46,16 +46,31 @@ public class QQHander extends SearchHanderAbstract {
     @Autowired
     private QQConfig config;
     @Override
-    public QQConfig getConfig() {
-        return config;
+    public  QQConfig getConfig() {
+        return  config;
+    }
+
+    public QQSearchEntity qqSearchEntity = new QQSearchEntity();
+
+    @Override
+    public String getPlugName() {
+        return "qq";
+    }
+
+    public QQSearchEntity getqqSearchEntity() {
+        return qqSearchEntity;
+    }
+
+    public void setQqSearchEntity(QQSearchEntity qqSearchEntity) {
+        this.qqSearchEntity = qqSearchEntity;
     }
 
     @Override
     public PlugSearchResult<PlugSearchMusicResult> querySongByName(SearchKeyData searchKeyData) {
         String searchUrl = config.getSearchUrl();
-        String s = QQSearchEntity.searchRequestParam(searchKeyData.getSearchkey(), QQSearchType.MUSIC.getValue(), searchKeyData.getPageIndex(), searchKeyData.getPageSize());
+        String s = getqqSearchEntity().searchRequestParam(searchKeyData.getSearchkey(), QQSearchType.MUSIC.getValue(), searchKeyData.getPageIndex(), searchKeyData.getPageSize());
         Mapper mapper = DownloadUtils.getHttp().sync(searchUrl).addHeader("Content-Type","json/application;charset=utf-8").addHeader("Referer","https://y.qq.com").addHeader("User-Agent","QQ%E9%9F%B3%E4%B9%90/73222 CFNetwork/1406.0.3 Darwin/22.4.0").bodyType(OkHttps.JSON).setBodyPara(s).post().getBody().toMapper();
-        PlugSearchResult<PlugSearchMusicResult> plugSearchResult = QQSearchEntity.toMusicPlugSearchResult(mapper, config);
+        PlugSearchResult<PlugSearchMusicResult> plugSearchResult = getqqSearchEntity().toMusicPlugSearchResult(mapper, config);
         plugSearchResult.setSearchIndex(searchKeyData.getPageIndex());
         plugSearchResult.setSearchSize(searchKeyData.getPageSize());
         plugSearchResult.setSearchTotal(plugSearchResult.getRecords().size());
@@ -66,9 +81,9 @@ public class QQHander extends SearchHanderAbstract {
     @Override
     public PlugSearchResult<PlugSearchArtistResult> queryArtistByName(SearchKeyData searchKeyData) {
         String searchUrl = config.getSearchUrl();
-        String s = QQSearchEntity.searchRequestParam(searchKeyData.getSearchkey(), QQSearchType.ARTIST.getValue(), searchKeyData.getPageIndex(), searchKeyData.getPageSize());
+        String s = getqqSearchEntity().searchRequestParam(searchKeyData.getSearchkey(), QQSearchType.ARTIST.getValue(), searchKeyData.getPageIndex(), searchKeyData.getPageSize());
         Mapper mapper = DownloadUtils.getHttp().sync(searchUrl).addHeader("Content-Type","json/application;charset=utf-8").addHeader("Referer","https://y.qq.com").addHeader("User-Agent","QQ%E9%9F%B3%E4%B9%90/73222 CFNetwork/1406.0.3 Darwin/22.4.0").bodyType(OkHttps.JSON).setBodyPara(s).post().getBody().toMapper();
-        PlugSearchResult<PlugSearchArtistResult> artistPlugSearchResult = QQSearchEntity.toArtistPlugSearchResult(mapper);
+        PlugSearchResult<PlugSearchArtistResult> artistPlugSearchResult = getqqSearchEntity().toArtistPlugSearchResult(mapper);
         artistPlugSearchResult.setSearchIndex(searchKeyData.getPageIndex());
         artistPlugSearchResult.setSearchSize(searchKeyData.getPageSize());
         artistPlugSearchResult.setSearchTotal(artistPlugSearchResult.getRecords().size());
@@ -79,9 +94,9 @@ public class QQHander extends SearchHanderAbstract {
     @Override
     public PlugSearchResult<PlugSearchAlbumResult> queryAlbumByName(SearchKeyData searchKeyData) {
         String searchUrl = config.getSearchUrl();
-        String s = QQSearchEntity.searchRequestParam(searchKeyData.getSearchkey(), QQSearchType.ALBUM.getValue(), searchKeyData.getPageIndex(), searchKeyData.getPageSize());
+        String s = getqqSearchEntity().searchRequestParam(searchKeyData.getSearchkey(), QQSearchType.ALBUM.getValue(), searchKeyData.getPageIndex(), searchKeyData.getPageSize());
         Mapper mapper = DownloadUtils.getHttp().sync(searchUrl).addHeader("Content-Type","json/application;charset=utf-8").addHeader("Referer","https://y.qq.com").addHeader("User-Agent","QQ%E9%9F%B3%E4%B9%90/73222 CFNetwork/1406.0.3 Darwin/22.4.0").bodyType(OkHttps.JSON).setBodyPara(s).post().getBody().toMapper();
-        PlugSearchResult<PlugSearchAlbumResult> albumPlugSearchResult = QQSearchEntity.toAlbumPlugSearchResult(mapper);
+        PlugSearchResult<PlugSearchAlbumResult> albumPlugSearchResult = getqqSearchEntity().toAlbumPlugSearchResult(mapper);
         albumPlugSearchResult.setSearchIndex(searchKeyData.getPageIndex());
         albumPlugSearchResult.setSearchSize(searchKeyData.getPageSize());
         albumPlugSearchResult.setSearchTotal(albumPlugSearchResult.getRecords().size());
@@ -92,14 +107,14 @@ public class QQHander extends SearchHanderAbstract {
     @Override
     public Music querySongById(String SongId) {
         String searchUrl = config.getSearchUrl();
-        String s = QQSearchEntity.musicInfoRequestParam(SongId);
+        String s = getqqSearchEntity().musicInfoRequestParam(SongId);
         Mapper mapper = DownloadUtils.getHttp().sync(searchUrl).setBodyPara(s).post().getBody().toMapper();
-        return QQSearchEntity.songInfoToMusic(mapper, config);
+        return getqqSearchEntity().songInfoToMusic(mapper, config);
     }
 
     @Override
     public Artists queryArtistById(String artistId) {
-        Artists plugArtistResult = QQSearchEntity.toPlugArtistResult(artistId, config);
+        Artists plugArtistResult = getqqSearchEntity().toPlugArtistResult(artistId, config);
         return plugArtistResult;
 
     }
@@ -107,9 +122,9 @@ public class QQHander extends SearchHanderAbstract {
     @Override
     public Album queryAlbumById(String albumId) {
         String searchUrl = config.getSearchUrl();
-        String s = QQSearchEntity.albumInfoRequestParam(albumId);
+        String s = getqqSearchEntity().albumInfoRequestParam(albumId);
         Mapper mapper = DownloadUtils.getHttp().sync(searchUrl).setBodyPara(s).post().getBody().toMapper();
-        Album album = QQSearchEntity.albumInfoToAlbum(mapper, config);
+        Album album = getqqSearchEntity().albumInfoToAlbum(mapper, config);
         return album;
 
 
@@ -117,25 +132,25 @@ public class QQHander extends SearchHanderAbstract {
 
     @Override
     public String queryLyric(String SongId) {
-        String s = QQSearchEntity.toPlugLyricResult(SongId,config);
+        String s = getqqSearchEntity().toPlugLyricResult(SongId,config);
         return s;
     }
 
     @Override
     public List<Album> getAlbumsByArtist(String artistId, Integer pageIndex, Integer pageSize) {
         String searchUrl = config.getSearchUrl();
-        String s = QQSearchEntity.artistsTransferAlbumParam(artistId);
+        String s = getqqSearchEntity().artistsTransferAlbumParam(artistId);
         Mapper mapper = DownloadUtils.getHttp().sync(searchUrl).setBodyPara(s).post().getBody().toMapper();
-        List<Album> albums = QQSearchEntity.artistsTransferAlbum(mapper, config);
+        List<Album> albums = getqqSearchEntity().artistsTransferAlbum(mapper, config);
         return albums;
     }
 
     @Override
     public List<Music> getAlbumSongByAlbumsId(String albumsId) {
         String searchUrl = config.getSearchUrl();
-        String s = QQSearchEntity.albumInfoRequestParam(albumsId);
+        String s = getqqSearchEntity().albumInfoRequestParam(albumsId);
         Mapper mapper = DownloadUtils.getHttp().sync(searchUrl).setBodyPara(s).post().getBody().toMapper();
-        List<Music> albumMusic = QQSearchEntity.albumInfoToAlbumMusic(mapper, config);
+        List<Music> albumMusic = getqqSearchEntity().albumInfoToAlbumMusic(mapper, config);
         return albumMusic;
 
 
@@ -299,10 +314,10 @@ public class QQHander extends SearchHanderAbstract {
                 change.set(md.getMusicArtists());
             }
             if (isAudioBook) {
-                downloadEntities.add(new DownloadEntity("nKwSearchHander",md.getId(), brType, md.getMusicName(), artist, albumName, isAudioBook));
+                downloadEntities.add(new DownloadEntity("qqHander",md.getId(), brType, md.getMusicName(), artist, albumName, isAudioBook));
             } else {
                 //添加到缓存
-                downloadEntities.add(new DownloadEntity("nKwSearchHander",md.getId(), brType, md.getMusicName(), change.get(), md.getMusicAlbum()));
+                downloadEntities.add(new DownloadEntity("qqHander",md.getId(), brType, md.getMusicName(), change.get(), md.getMusicAlbum()));
             }
 
         });
@@ -313,9 +328,9 @@ public class QQHander extends SearchHanderAbstract {
     @Override
     public List<DownloadEntity> downloadArtistAllSong(String artistId, PlugBrType brType, String addSubsonicPlayListName) {
         String searchUrl = config.getSearchUrl();
-        String s = QQSearchEntity.artistsTransferAlbumParam(artistId);
+        String s = getqqSearchEntity().artistsTransferAlbumParam(artistId);
         Mapper mapper = DownloadUtils.getHttp().sync(searchUrl).setBodyPara(s).post().getBody().toMapper();
-        List<Album> albums = QQSearchEntity.artistsTransferAlbum(mapper, config);
+        List<Album> albums = getqqSearchEntity().artistsTransferAlbum(mapper, config);
         ArrayList<DownloadEntity> downloadEntitys = new ArrayList<>();
         for (Album album : albums) {
             ArrayList<DownloadEntity> downloadEntities = downloadAlbum(album.getAlbumId(), brType, addSubsonicPlayListName, album.getAlbumArtists(), false, album.getAlbumName());
@@ -327,9 +342,9 @@ public class QQHander extends SearchHanderAbstract {
     @Override
     public List<DownloadEntity> downloadArtistAllAlbum(String artistId, PlugBrType brType, String addSubsonicPlayListName) {
         String searchUrl = config.getSearchUrl();
-        String s = QQSearchEntity.artistsTransferAlbumParam(artistId);
+        String s = getqqSearchEntity().artistsTransferAlbumParam(artistId);
         Mapper mapper = DownloadUtils.getHttp().sync(searchUrl).setBodyPara(s).post().getBody().toMapper();
-        List<Album> albums = QQSearchEntity.artistsTransferAlbum(mapper, config);
+        List<Album> albums = getqqSearchEntity().artistsTransferAlbum(mapper, config);
         ArrayList<DownloadEntity> downloadEntitys = new ArrayList<>();
         for (Album album : albums) {
             ArrayList<DownloadEntity> downloadEntities = downloadAlbum(album.getAlbumId(), brType, addSubsonicPlayListName, album.getAlbumArtists(), false, album.getAlbumName());

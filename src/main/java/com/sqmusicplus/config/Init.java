@@ -8,6 +8,7 @@ import com.sqmusicplus.base.entity.SqConfig;
 import com.sqmusicplus.download.DownloadExcute;
 import com.sqmusicplus.plug.netease.config.NeteaseConfig;
 import com.sqmusicplus.plug.netease.hander.NeteaseHander;
+import com.sqmusicplus.plug.qqvip.QQvipHander;
 import com.sqmusicplus.plug.subsonic.SubsonicHander;
 import com.sqmusicplus.plug.subsonic.config.NowPlayList;
 import com.sqmusicplus.plug.subsonic.entity.SubsonicPlayList;
@@ -38,6 +39,8 @@ public class Init implements ApplicationRunner {
     private SqConfigService configService;
     @Autowired
     private SubsonicHander subsonicHander;
+    @Autowired
+    private QQvipHander qqvipHander;
     @Value("${server.port}")
     private String port;
     @Value("${version}")
@@ -69,6 +72,7 @@ public class Init implements ApplicationRunner {
             downloadExcute.getDownloadInfo();
         }
         neteaseHander.initPlug();
+        qqvipHander.initPlug();
         log.info("当前服务版本->{}", version);
 
 

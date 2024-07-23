@@ -23,6 +23,12 @@ public interface SearchHander {
     <C> C getConfig();
 
     /**
+     * 返回插件名称
+     * @return
+     */
+    String getPlugName();
+
+    /**
      * 根据名称搜素歌曲
      *
      * @param searchKeyData
@@ -178,5 +184,11 @@ public interface SearchHander {
      * @param downloadEntity 下载对象
      */
     void dnonloadAndSaveToFile(DownloadEntity downloadEntity,SearchHander searchHander);
+    /**
+     * 保存歌曲到文件并写入标签(下载歌曲)
+     *
+     * @param downloadEntity 下载对象
+     */
+    void dnonloadAndSaveToFile(DownloadEntity downloadEntity,Object searchHander);
 
 }

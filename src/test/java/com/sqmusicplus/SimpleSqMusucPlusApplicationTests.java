@@ -17,9 +17,13 @@ import com.sqmusicplus.utils.DateUtils;
 import com.sqmusicplus.utils.DownloadUtils;
 import com.sqmusicplus.utils.OkHttpUtils;
 import com.sqmusicplus.utils.ZLibUtils;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.xm.Similarity;
 import top.yumbo.util.music.MusicEnum;
 import top.yumbo.util.music.musicImpl.netease.NeteaseCloudMusicInfo;
 
@@ -27,6 +31,7 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -74,14 +79,32 @@ class SimpleSqMusucPlusApplicationTests {
     @Test
     public void contextLoads() throws IOException, ScriptException, NoSuchMethodException {
 
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("JavaScript");
 
-        Invocable inv = (Invocable) engine;
+String url ="https://c1026.lanosso.com/c91fad0ef1c23a52c83ed989e1b7955d/669e53a7/2022/11/30/0c986867539412b76408d20c1ef899c2.mp3?fn=%E7%94%9F%E3%81%8D%E3%81%A6%E3%81%93%E3%81%9D%20(%E6%AD%A3%E5%9B%A0%E6%B4%BB%E7%9D%80)-Kiroro.320.mp3";
 
-        String javascriptPath = "C:\\Users\\Administrator\\Desktop\\MyFree.js";
-        engine.eval(new FileReader(javascriptPath));
-        System.out.println(inv.invokeFunction("search", "周杰伦"));
+        boolean download = DownloadUtils.download(url, new File("D:\\temp\\sq\\aaaa.mp3"));
+        System.out.println(download);
+//        String word1 = "不枉此生(电视剧《雪山飞狐》主题曲)";
+//        String word2 = "不枉此生";
+//        double cilinSimilarityResult = Similarity.cilinSimilarity(word1, word2);
+//        double pinyinSimilarityResult = Similarity.pinyinSimilarity(word1, word2);
+//        double conceptSimilarityResult = Similarity.conceptSimilarity(word1, word2);
+//        double charBasedSimilarityResult = Similarity.charBasedSimilarity(word1, word2);
+//
+//        System.out.println(word1 + " vs " + word2 + " 词林相似度值：" + cilinSimilarityResult);
+//        System.out.println(word1 + " vs " + word2 + " 拼音相似度值：" + pinyinSimilarityResult);
+//        System.out.println(word1 + " vs " + word2 + " 概念相似度值：" + conceptSimilarityResult);
+//        System.out.println(word1 + " vs " + word2 + " 字面相似度值：" + charBasedSimilarityResult);
+
+
+//        ScriptEngineManager manager = new ScriptEngineManager();
+//        ScriptEngine engine = manager.getEngineByName("JavaScript");
+//
+//        Invocable inv = (Invocable) engine;
+//
+//        String javascriptPath = "C:\\Users\\Administrator\\Desktop\\MyFree.js";
+//        engine.eval(new FileReader(javascriptPath));
+//        System.out.println(inv.invokeFunction("search", "周杰伦"));
 
 
 
@@ -161,6 +184,35 @@ class SimpleSqMusucPlusApplicationTests {
 //        System.out.println(s);
 //    }
 
+    @Test
+    public void downloadLyric(){
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url("https://api.liumingye.cn/m/api/lyric/id/m4eedd78464c21ce789dea6928415b323-fa4273678781b988a016b813970ee9d7-f89edca7c1ee56f620ab70817d12f739/name/Thinking About You - Jay Sean,Hardwell")
+                .get()
+                .addHeader("accept", "*/*")
+                .addHeader("accept-language", "zh-CN,zh;q=0.9")
+                .addHeader("origin", "https://tool.liumingye.cn")
+                .addHeader("priority", "u=1, i")
+                .addHeader("sec-ch-ua", "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
+                .addHeader("sec-ch-ua-mobile", "?0")
+                .addHeader("sec-ch-ua-platform", "\"Windows\"")
+                .addHeader("sec-fetch-dest", "empty")
+                .addHeader("sec-fetch-mode", "cors")
+                .addHeader("sec-fetch-site", "same-site")
+                .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            System.out.println(response.body().string());
+
+        } catch (IOException e) {
+
+        }
+
+    }
 
 
 }

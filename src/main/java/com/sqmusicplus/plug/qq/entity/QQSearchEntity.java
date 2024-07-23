@@ -35,6 +35,15 @@ import java.util.concurrent.atomic.AtomicReference;
 public class QQSearchEntity {
 
 
+    private  String plugName = "qq";
+
+    public void setPlugName(String plugName) {
+        this.plugName = plugName;
+    }
+
+    public  String getPlugName() {
+        return plugName;
+    }
 
     /**
      * 搜索请求参数
@@ -44,7 +53,9 @@ public class QQSearchEntity {
      * @param num_per_page
      * @return
      */
-    public static String searchRequestParam(String query,String search_type ,Integer page_num,Integer num_per_page) {
+
+
+    public  String searchRequestParam(String query,String search_type ,Integer page_num,Integer num_per_page) {
 //        String msg = """
 //            {
 //                "music.search.SearchCgiService.DoSearchForQQMusicDesktop": {
@@ -91,7 +102,7 @@ public class QQSearchEntity {
      * @param mid
      * @return
      */
-    public static String lyricRequestParam(String mid) {
+    public  String lyricRequestParam(String mid) {
         String msg = """
                 {
                            "music.musichallSong.PlayLyricInfo.GetPlayLyricInfo": {
@@ -147,7 +158,7 @@ public class QQSearchEntity {
      * @param mid
      * @return
      */
-    public static String musicInfoRequestParam(String mid) {
+    public  String musicInfoRequestParam(String mid) {
         String msg = """
                 {
                         "songinfo": {
@@ -169,7 +180,7 @@ public class QQSearchEntity {
      * @param albummid
      * @return
      */
-    public static String albumInfoRequestParam(String albummid) {
+    public  String albumInfoRequestParam(String albummid) {
         String msg = """
                 {
                            "AlbumSongList": {
@@ -198,7 +209,7 @@ public class QQSearchEntity {
      * @param albummid
      * @return
      */
-    public static String artistsTransferAlbumParam(String albummid) {
+    public  String artistsTransferAlbumParam(String albummid) {
 
         String msg = """
                 {
@@ -230,12 +241,13 @@ public class QQSearchEntity {
      * @param qqConfig
      * @return
      */
-    public static PlugSearchResult<PlugSearchMusicResult> toMusicPlugSearchResult(Mapper mapper, QQConfig qqConfig) {
+    public  PlugSearchResult<PlugSearchMusicResult> toMusicPlugSearchResult(Mapper mapper, QQConfig qqConfig) {
         ArrayList<PlugSearchMusicResult> plugSearchMusicResults = new ArrayList<>();
         Array array = mapper.getMapper("req").getMapper("data")
                 .getMapper("body").getMapper("song").getArray("list");
         array.forEach((i,e)-> {
             String mid = e.toMapper().getString("mid");
+
             String name = e.toMapper().getString("name");
             String artistName = "";
             ArrayList<String> strings = new ArrayList<>();
@@ -254,7 +266,7 @@ public class QQSearchEntity {
             String albumImage = albumImageconfig.replaceAll("#\\{pmid}", pmid);
             String lyricResult = toPlugLyricResult(mid,qqConfig);
             PlugSearchMusicResult plugSearchMusicResult = new PlugSearchMusicResult();
-            plugSearchMusicResult.setSearchType(PlugBrType.QQ_Flac_2000.getPlugName());
+            plugSearchMusicResult.setSearchType(getPlugName());
             plugSearchMusicResult.setId(mid);
             plugSearchMusicResult.setName(name);
             plugSearchMusicResult.setArtistName(artistName);
@@ -269,7 +281,7 @@ public class QQSearchEntity {
 
         });
         PlugSearchResult<PlugSearchMusicResult> plugSearchResult = new PlugSearchResult<>();
-        plugSearchResult.setSearchType(PlugBrType.QQ_Flac_2000.getPlugName());
+        plugSearchResult.setSearchType(getPlugName());
         plugSearchResult.setRecords(plugSearchMusicResults);
         return plugSearchResult;
     }
@@ -279,7 +291,7 @@ public class QQSearchEntity {
      * @param mapper
      * @return
      */
-    public static PlugSearchResult<PlugSearchArtistResult> toArtistPlugSearchResult(Mapper mapper) {
+    public  PlugSearchResult<PlugSearchArtistResult> toArtistPlugSearchResult(Mapper mapper) {
         ArrayList<PlugSearchArtistResult> plugSearchArtistResults = new ArrayList<>();
         Array array = mapper.getMapper("req").getMapper("data")
                 .getMapper("body").getMapper("singer").getArray("list");
@@ -290,7 +302,7 @@ public class QQSearchEntity {
             String singerPic = e.toMapper().getString("singerPic");
             String string = e.toMapper().getString("albumNum");
             PlugSearchArtistResult plugSearchArtistResult = new PlugSearchArtistResult();
-            plugSearchArtistResult.setSearchType(PlugBrType.QQ_Flac_2000.getPlugName());
+            plugSearchArtistResult.setSearchType(getPlugName());
             plugSearchArtistResult.setArtistName(singerName);
             plugSearchArtistResult.setTotal(string);
             plugSearchArtistResult.setArtistid(singerID);
@@ -300,7 +312,7 @@ public class QQSearchEntity {
 
         });
         PlugSearchResult<PlugSearchArtistResult> plugSearchResult = new PlugSearchResult<>();
-        plugSearchResult.setSearchType(PlugBrType.QQ_Flac_2000.getPlugName());
+        plugSearchResult.setSearchType(getPlugName());
         plugSearchResult.setRecords(plugSearchArtistResults);
         return plugSearchResult;
     }
@@ -312,7 +324,7 @@ public class QQSearchEntity {
      * @param qqConfig
      * @return
      */
-    public static Music songInfoToMusic(Mapper mapper,QQConfig qqConfig) {
+    public  Music songInfoToMusic(Mapper mapper,QQConfig qqConfig) {
         Mapper mapper1 = mapper.getMapper("songinfo").getMapper("data").getMapper("track_info");
         String name = mapper1.getString("name");
         String mid = mapper1.getString("mid");
@@ -343,7 +355,7 @@ public class QQSearchEntity {
      * @param qqConfig
      * @return
      */
-    public static Album albumInfoToAlbum(Mapper mapper, QQConfig qqConfig) {
+    public  Album albumInfoToAlbum(Mapper mapper, QQConfig qqConfig) {
 
         Array array = mapper.getMapper("AlbumSongList").getMapper("data").getArray("songList");
 
@@ -384,7 +396,7 @@ public class QQSearchEntity {
                  .setAlbumId(albumid.get())
                  .setAlbumArtistId(artistid.get());
     }
-    public static List<Music> albumInfoToAlbumMusic(Mapper mapper, QQConfig qqConfig) {
+    public  List<Music> albumInfoToAlbumMusic(Mapper mapper, QQConfig qqConfig) {
 
         Array array = mapper.getMapper("AlbumSongList").getMapper("data").getArray("songList");
 
@@ -407,7 +419,7 @@ public class QQSearchEntity {
      * @param mapper
      * @return
      */
-    public static PlugSearchResult<PlugSearchAlbumResult> toAlbumPlugSearchResult(Mapper mapper) {
+    public  PlugSearchResult<PlugSearchAlbumResult> toAlbumPlugSearchResult(Mapper mapper) {
         ArrayList<PlugSearchAlbumResult> plugSearchAlbumResults = new ArrayList<>();
         Array array = mapper.getMapper("req").getMapper("data")
                 .getMapper("body").getMapper("album").getArray("list");
@@ -418,7 +430,7 @@ public class QQSearchEntity {
             String singerID = e.toMapper().getString("singerID");
             String albumPic = e.toMapper().getString("albumPic");
             PlugSearchAlbumResult plugSearchAlbumResult = new PlugSearchAlbumResult();
-            plugSearchAlbumResult.setSearchType(PlugBrType.QQ_Flac_2000.getPlugName());
+            plugSearchAlbumResult.setSearchType(getPlugName());
             plugSearchAlbumResult.setAlbumName(albumName);
             plugSearchAlbumResult.setAlbumid(albumID);
             plugSearchAlbumResult.setArtistName(singerName);
@@ -428,7 +440,7 @@ public class QQSearchEntity {
 
         });
         PlugSearchResult<PlugSearchAlbumResult> plugSearchResult = new PlugSearchResult<>();
-        plugSearchResult.setSearchType(PlugBrType.QQ_Flac_2000.getPlugName());
+        plugSearchResult.setSearchType(getPlugName());
         plugSearchResult.setRecords(plugSearchAlbumResults);
         return plugSearchResult;
     }
@@ -440,7 +452,7 @@ public class QQSearchEntity {
      * @return
      */
     //歌词
-    public static String toPlugLyricResult(String musicId,QQConfig qqConfig){
+    public  String toPlugLyricResult(String musicId,QQConfig qqConfig){
         String s = lyricRequestParam(musicId);
         String searchUrl = qqConfig.getSearchUrl();
         Mapper mapper = DownloadUtils.getHttp().sync(searchUrl).setBodyPara(s).post().getBody().toMapper();
@@ -456,7 +468,7 @@ public class QQSearchEntity {
      * @param qqConfig
      * @return
      */
-    public static Artists toPlugArtistResult(String artistId,QQConfig qqConfig){
+    public  Artists toPlugArtistResult(String artistId,QQConfig qqConfig){
         String artistImage = qqConfig.getArtistImage();
         String pic = artistImage.replaceAll("#\\{pmid}", artistId);
         Artists artists = new Artists();
@@ -471,7 +483,7 @@ public class QQSearchEntity {
      * @param qqConfig
      * @return
      */
-    public static List<Album> artistsTransferAlbum (Mapper mapper, QQConfig qqConfig){
+    public  List<Album> artistsTransferAlbum (Mapper mapper, QQConfig qqConfig){
         ArrayList<Album> albums = new ArrayList<>();
         Array array = mapper.getMapper("singerAlbum").getMapper("data").getArray("list");
         array.forEach((i,e)-> {

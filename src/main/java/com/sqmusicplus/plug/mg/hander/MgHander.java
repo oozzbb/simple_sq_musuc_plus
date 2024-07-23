@@ -45,6 +45,10 @@ public class MgHander extends SearchHanderAbstract  {
     private MgConfig mgConfig;
 
 
+    @Override
+    public String getPlugName() {
+        return "mg";
+    }
 
     @Override
     public PlugSearchResult querySongByName(SearchKeyData searchKeyData) {
@@ -68,7 +72,7 @@ public class MgHander extends SearchHanderAbstract  {
             plugSearchMusicResult.setArtistid(music.getSingerId());
             plugSearchMusicResult.setPic(music.getCover());
             plugSearchMusicResult.setLyricId(music.getCopyrightId());
-            plugSearchMusicResult.setSearchType("mg");
+            plugSearchMusicResult.setSearchType(getPlugName());
 //            plugSearchMusicResult.setOter(JSONObject.toJSONString(music));
             plugSearchMusicResults.add(plugSearchMusicResult);
         }
@@ -80,7 +84,7 @@ public class MgHander extends SearchHanderAbstract  {
                 .setSearchTotal(mgSearchMusicResult.getPgt())
                 .setSearchKeyWork(searchKeyData.getSearchkey())
                 .setRecords(plugSearchMusicResults);
-        plugSearchResult.setSearchType(searchKeyData.getSearchType());
+        plugSearchResult.setSearchType(getPlugName());
         return plugSearchResult;
     }
 
@@ -101,14 +105,14 @@ public class MgHander extends SearchHanderAbstract  {
             plugSearchArtistResult.setArtistName(artist.getTitle());
             plugSearchArtistResult.setPic(artist.getArtistPicL());
             plugSearchArtistResult.setTotal(artist.getAlbumNum()+"");
-            plugSearchArtistResult.setSearchType(PlugBrType.MG_FLAC_2000.getPlugName());
+            plugSearchArtistResult.setSearchType(getPlugName());
             plugSearchArtistResult.setOter(JSONObject.toJSONString(artist));
             plugSearchMusicResults.add(plugSearchArtistResult);
         }
         PlugSearchResult<PlugSearchArtistResult> plugSearchResult = new PlugSearchResult<>();
         plugSearchResult.setSearchIndex(searchKeyData.getPageIndex())
                 .setSearchSize(searchKeyData.getPageSize())
-                .setSearchType(searchKeyData.getSearchType())
+                .setSearchType(getPlugName())
                 .setSearchTotal(mgSearchArtistResult.getPgt())
                 .setSearchKeyWork(searchKeyData.getSearchkey())
                 .setRecords(plugSearchMusicResults);
@@ -134,13 +138,13 @@ public class MgHander extends SearchHanderAbstract  {
             plugSearchAlbumResult.setArtistName(album.getSinger().stream().map(MgSearchAlbumResult.AlbumsDTO.SingerDTO::getName).collect(Collectors.joining(",")));
             plugSearchAlbumResult.setArtistid(album.getSinger().stream().map(MgSearchAlbumResult.AlbumsDTO.SingerDTO::getId).collect(Collectors.joining(",")));
 
-            plugSearchAlbumResult.setSearchType(PlugBrType.MG_FLAC_2000.getPlugName());
+            plugSearchAlbumResult.setSearchType(getPlugName());
             plugSearchMusicResults.add(plugSearchAlbumResult);
         }
         PlugSearchResult<PlugSearchAlbumResult> plugSearchResult = new PlugSearchResult<>();
         plugSearchResult.setSearchIndex(searchKeyData.getPageIndex())
                 .setSearchSize(searchKeyData.getPageSize())
-                .setSearchType(searchKeyData.getSearchType())
+                .setSearchType(getPlugName())
                 .setSearchTotal(mgSearchAlbumResult.getPgt())
                 .setSearchKeyWork(searchKeyData.getSearchkey())
                 .setRecords(plugSearchMusicResults);

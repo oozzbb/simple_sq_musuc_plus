@@ -74,7 +74,8 @@ public abstract class SearchHanderAbstract implements SearchHander, Serializable
                 log.debug("下载失败{}", music.getMusicName());
                 throw new RuntimeException("下载失败:" + music.getMusicName());
             }
-            DownloadUtils.download(stringStringHashMap.get("url"), type, onSuccess -> {
+            DownloadUtils.download(stringStringHashMap.get("url"), type, onSuccess ->
+            {
                 String albumID = music.getAlbumId();
                 String artistsID = music.getArtistsId();
                 Artists artists = searchHander.queryArtistById(artistsID.toString());
@@ -173,9 +174,15 @@ public abstract class SearchHanderAbstract implements SearchHander, Serializable
             });
 
         } catch (Exception e) {
+            e.printStackTrace();
             log.debug("下载失败{}", downloadEntity.getMusicname());
             throw new RuntimeException("下载失败:" + downloadEntity.getMusicname());
         }
+    }
+
+    @Override
+    public void dnonloadAndSaveToFile(DownloadEntity downloadEntity, Object searchHander) {
+        this.dnonloadAndSaveToFile(downloadEntity, (SearchHander)searchHander);
     }
 
     /**
@@ -186,7 +193,7 @@ public abstract class SearchHanderAbstract implements SearchHander, Serializable
      * @param albumfile
      * @param downloadEntity
      */
-    private void extracted(Music music, File onSuccess, File albumfile, DownloadEntity downloadEntity) {
+    private synchronized void extracted(Music music, File onSuccess, File albumfile, DownloadEntity downloadEntity) {
         //创建歌词
         try {
             if (StringUtils.isNotEmpty(music.getMusicLyric())) {

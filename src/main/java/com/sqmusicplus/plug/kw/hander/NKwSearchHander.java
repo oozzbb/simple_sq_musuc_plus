@@ -43,6 +43,11 @@ public class NKwSearchHander extends SearchHanderAbstract {
 
 
     @Override
+    public String getPlugName() {
+        return "kw";
+    }
+
+    @Override
     public PlugSearchResult<PlugSearchMusicResult> querySongByName(SearchKeyData searchKeyData) {
         String searchUrl = config.getSearchUrl();
         String s = searchUrl.replaceAll("#\\{pn}", searchKeyData.getPageIndex().toString())
@@ -71,7 +76,7 @@ public class NKwSearchHander extends SearchHanderAbstract {
                                     .setArtistName(e.getArtist())
                                     .setArtistid(e.getArtistid())
                                     .setId(e.getMusicrid().replaceAll("MUSIC_",""))
-                                    .setSearchType(searchKeyData.getSearchType())
+                                    .setSearchType(getPlugName())
                                     .setDuration(duration)
                                     .setName(e.getName()).setPic(getConfig().getSongCoverUrl() + e.getWebAlbumpicShort())
                     );
@@ -80,11 +85,11 @@ public class NKwSearchHander extends SearchHanderAbstract {
         PlugSearchResult<PlugSearchMusicResult> plugSearchResult = new PlugSearchResult<>();
         plugSearchResult.setSearchIndex(searchKeyData.getPageIndex())
                 .setSearchSize(searchKeyData.getPageSize())
-                .setSearchType(searchKeyData.getSearchType())
+                .setSearchType(getPlugName())
                 .setSearchTotal(searchMusicResult.getTotal())
                 .setSearchKeyWork(searchKeyData.getSearchkey())
                 .setRecords(plugSearchMusicResults);
-        plugSearchResult.setSearchType(searchKeyData.getSearchType());
+        plugSearchResult.setSearchType(getPlugName());
         return plugSearchResult;
     }
 
@@ -102,7 +107,7 @@ public class NKwSearchHander extends SearchHanderAbstract {
 
         searchArtistResult.getAbslist().forEach(e -> plugSearchArtistResults.add(new PlugSearchArtistResult().setArtistName(e.getArtist())
                 .setArtistid(e.getArtistid())
-                .setSearchType(searchKeyData.getSearchType())
+                .setSearchType(getPlugName())
                 .setPic(e.getHtsPicpath().replaceAll("/240", "/500"))
                         .setArtistName(e.getArtist())
                 .setOter(JSONObject.toJSONString(e))
@@ -112,11 +117,11 @@ public class NKwSearchHander extends SearchHanderAbstract {
         PlugSearchResult<PlugSearchArtistResult> plugSearchResult = new PlugSearchResult<>();
         plugSearchResult.setSearchIndex(searchKeyData.getPageIndex())
                 .setSearchSize(searchKeyData.getPageSize())
-                .setSearchType(searchKeyData.getSearchType())
+                .setSearchType(getPlugName())
                 .setSearchTotal(Integer.valueOf(searchArtistResult.getTotal()))
                 .setSearchKeyWork(searchKeyData.getSearchkey())
                 .setRecords(plugSearchArtistResults);
-        plugSearchResult.setSearchType(searchKeyData.getSearchType());
+        plugSearchResult.setSearchType(getPlugName());
         return plugSearchResult;
     }
 
@@ -135,16 +140,16 @@ public class NKwSearchHander extends SearchHanderAbstract {
                 .setAlbumid(e.getAlbumid())
                 .setArtistName(e.getArtist())
                 .setArtistid(e.getArtistid())
-                .setSearchType(searchKeyData.getSearchType())
+                .setSearchType(getPlugName())
                 .setPic(config.getSongCoverUrl()+e.getPic())));
         PlugSearchResult<PlugSearchAlbumResult> plugSearchResult = new PlugSearchResult<>();
         plugSearchResult.setSearchIndex(searchKeyData.getPageIndex())
                 .setSearchSize(searchKeyData.getPageSize())
-                .setSearchType(searchKeyData.getSearchType())
+                .setSearchType(getPlugName())
                 .setSearchTotal(Integer.valueOf(searchAlbumResult.getTotal()))
                 .setSearchKeyWork(searchKeyData.getSearchkey())
                 .setRecords(plugSearchAlbumResults);
-        plugSearchResult.setSearchType( searchKeyData.getSearchType());
+        plugSearchResult.setSearchType(getPlugName());
         return plugSearchResult;
     }
 

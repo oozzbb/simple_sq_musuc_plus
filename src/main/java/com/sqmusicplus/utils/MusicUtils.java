@@ -54,65 +54,73 @@ public class MusicUtils {
         }
     }
 
-    public static MultimediaInfo setMediaFileInfo(File file, String title, String album, String artist, String comment, String lyrics, File image) throws TagException, CannotReadException, InvalidAudioFrameException, ReadOnlyFileException, IOException, CannotWriteException {
-        AudioFile af = AudioFileIO.read(file);
-        Tag tag = af.getTag();
-        if (tag instanceof ID3v1Tag) {
-            tag = new ID3v24Tag();
-        }
-        tag.setField(FieldKey.TITLE, title.trim());
-        tag.setField(FieldKey.ALBUM, album.trim());
-        tag.setField(FieldKey.ARTIST, artist.trim());
-        tag.setField(FieldKey.COMMENT, comment.trim());
-        if (StringUtils.isNotEmpty(lyrics)) {
-            try {
-                tag.setField(FieldKey.LYRICS, lyrics);
-            } catch (KeyNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (FieldDataInvalidException e) {
-                throw new RuntimeException(e);
+    public static  synchronized MultimediaInfo setMediaFileInfo(File file, String title, String album, String artist, String comment, String lyrics, File image) throws TagException, CannotReadException, InvalidAudioFrameException, ReadOnlyFileException, IOException, CannotWriteException {
+        try {
+            AudioFile af = AudioFileIO.read(file);
+            Tag tag = af.getTag();
+            if (tag instanceof ID3v1Tag) {
+                tag = new ID3v24Tag();
             }
-        }
-        if (image != null && image.exists()) {
-            try {
-                Artwork firstArtwork = tag.getFirstArtwork();
-                firstArtwork.setFromFile(image);
-                tag.setField(firstArtwork);
-            } catch (Exception e) {
+            tag.setField(FieldKey.TITLE, title.trim());
+            tag.setField(FieldKey.ALBUM, album.trim());
+            tag.setField(FieldKey.ARTIST, artist.trim());
+            tag.setField(FieldKey.COMMENT, comment.trim());
+            if (StringUtils.isNotEmpty(lyrics)) {
                 try {
-                    Artwork firstArtwork = Artwork.createArtworkFromFile(image);
-                    tag.setField(firstArtwork);
-                } catch (UnsupportedOperationException ex) {
-                    tag = new ID3v24Tag();
-                    tag.setField(FieldKey.TITLE, title.trim());
-                    tag.setField(FieldKey.ALBUM, album.trim());
-                    tag.setField(FieldKey.ARTIST, artist.trim());
-                    tag.setField(FieldKey.COMMENT, comment.trim());
-                    Artwork artworkFromFile = Artwork.createArtworkFromFile(image);
-                    tag.setField(artworkFromFile);
-                    if (StringUtils.isNotEmpty(lyrics)) {
-                        tag.setField(FieldKey.LYRICS, lyrics);
-                    }
-                } catch (FieldDataInvalidException fex) {
-                    BufferedImage bufferedImage = ImageIOUtils.read(image);
-                    ImgUtil.write(bufferedImage, image);
-                    Artwork firstArtwork = Artwork.createArtworkFromFile(image);
-                    tag.setField(firstArtwork);
-                } catch (Exception ale) {
-                    tag.setField(FieldKey.TITLE, title.trim());
-                    tag.setField(FieldKey.ALBUM, album.trim());
-                    tag.setField(FieldKey.ARTIST, artist.trim());
-                    tag.setField(FieldKey.COMMENT, comment.trim());
-                    if (StringUtils.isNotEmpty(lyrics)) {
-                        tag.setField(FieldKey.LYRICS, lyrics);
-                    }
+                    tag.setField(FieldKey.LYRICS, lyrics);
+                } catch (KeyNotFoundException e) {
+                    throw new RuntimeException(e);
+                } catch (FieldDataInvalidException e) {
+                    throw new RuntimeException(e);
                 }
             }
+            if (image != null && image.exists()) {
+                if (FileTypeUtils.checkType(image).contains("webp")){
+                    File jpgimage = new File(image.getAbsolutePath().replace(".webp", ".jpg"));
+                    image = ImageIOUtils.convertWebpToJpeg(image, jpgimage);
+                }
+                try {
+                    Artwork firstArtwork = tag.getFirstArtwork();
+                    firstArtwork.setFromFile(image);
+                    tag.setField(firstArtwork);
+                } catch (Exception e) {
+                    try {
+                        Artwork firstArtwork = Artwork.createArtworkFromFile(image);
+                        tag.setField(firstArtwork);
+                    } catch (UnsupportedOperationException ex) {
+                        tag = new ID3v24Tag();
+                        tag.setField(FieldKey.TITLE, title.trim());
+                        tag.setField(FieldKey.ALBUM, album.trim());
+                        tag.setField(FieldKey.ARTIST, artist.trim());
+                        tag.setField(FieldKey.COMMENT, comment.trim());
+                        Artwork artworkFromFile = Artwork.createArtworkFromFile(image);
+                        tag.setField(artworkFromFile);
+                        if (StringUtils.isNotEmpty(lyrics)) {
+                            tag.setField(FieldKey.LYRICS, lyrics);
+                        }
+                    } catch (FieldDataInvalidException fex) {
+                        BufferedImage bufferedImage = ImageIOUtils.read(image);
+                        ImgUtil.write(bufferedImage, image);
+                        Artwork firstArtwork = Artwork.createArtworkFromFile(image);
+                        tag.setField(firstArtwork);
+                    } catch (Exception ale) {
+                        tag.setField(FieldKey.TITLE, title.trim());
+                        tag.setField(FieldKey.ALBUM, album.trim());
+                        tag.setField(FieldKey.ARTIST, artist.trim());
+                        tag.setField(FieldKey.COMMENT, comment.trim());
+                        if (StringUtils.isNotEmpty(lyrics)) {
+                            tag.setField(FieldKey.LYRICS, lyrics);
+                        }
+                    }
+                }
 
+            }
+            af.setTag(tag);
+            AudioFileIO.write(af);
+            return null;
+        } catch (Exception e) {
+            return null;
         }
-        af.setTag(tag);
-        AudioFileIO.write(af);
-        return null;
     }
 
     public static DownloadEntity downloadInfoToDownloadEntity(DownloadInfo downloadInfo) {

@@ -8,6 +8,8 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
@@ -365,4 +367,34 @@ public class OkHttpUtils {
 //            }
 //        });
 //    }
+    /**
+     * 获取重定向地址
+     * @param path 原地址
+     * @return
+     * @throws Exception
+     */
+    public static String getRedirectUrl(String path) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url(path)
+                .get()
+                .addHeader("accept", "*/*")
+                .addHeader("accept-language", "zh-CN,zh;q=0.9")
+                .addHeader("origin", "https://tool.liumingye.cn")
+                .addHeader("priority", "u=1, i")
+                .addHeader("sec-ch-ua", "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
+                .addHeader("sec-ch-ua-mobile", "?0")
+                .addHeader("sec-ch-ua-platform", "\"Windows\"")
+                .addHeader("sec-fetch-dest", "empty")
+                .addHeader("sec-fetch-mode", "cors")
+                .addHeader("sec-fetch-site", "same-site")
+                .addHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
+                .build();
+
+        Response response = client.newCall(request).execute();
+        return  response.request().url().toString();
+
+    }
+
 }
