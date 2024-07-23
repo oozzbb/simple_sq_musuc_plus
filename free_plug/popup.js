@@ -22,9 +22,7 @@ document.getElementById('savebtn').addEventListener("click", function () {
        alert("请填写完整")
        return
    }
-   else{
-       url = "http://"+url
-   }
+
    //如果最后一位是/则删除掉
    if(url.endsWith("/")){
        url = url.substring(0,url.length-1)
