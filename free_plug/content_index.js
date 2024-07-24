@@ -192,16 +192,27 @@ function push(musicname,musicartistName,musicalbumName,downloadurl,musicimage,mu
         
     console.log("下载地址："+"musiclyrc请求的URL：" + musiclyrc);
 // 需要发送的数据
-// const data = {
-//     "musicname": musicname,
-//     "musicartistName": musicartistName,
-//     "musicalbumName": musicalbumName,
-//     "downloadurl": downloadurl,
-//     "musicimage": musicimage,
-//     "musiclyrc": musiclyrc,
-// };
+const data = {
+    "musicname": musicname,
+    "musicartistName": musicartistName,
+    "musicalbumName": musicalbumName,
+    "downloadurl": downloadurl,
+    "musicimage": musicimage,
+    "musiclyrc": musiclyrc,
+    "sqmusictoken": pushtoken
+};
+var jsonStr = JSON.stringify(data);
+
+ // 前端压缩
+ let clientData = pako.deflate(jsonStr);
+ 
+ // 变成 串
+ clientData = clientData.toString()
+console.log("ys:"+clientData);
 pushdiv.innerText="推送成功！";
-let pushdata = "?musicname="+musicname+"&musicartistName="+musicartistName+"&musicalbumName="+musicalbumName+"&downloadurl="+downloadurl+"&musicimage="+musicimage+"&musiclyrc="+musiclyrc+"&sqmusictoken="+pushtoken;
+// let pushdata = "?musicname="+musicname+"&musicartistName="+musicartistName+"&musicalbumName="+musicalbumName+"&downloadurl="+downloadurl+"&musicimage="+musicimage+"&musiclyrc="+musiclyrc+"&sqmusictoken="+pushtoken;
+let pushdata = "?data="+clientData;
+
 // window.open(url+pushdata, '_blank');
 window.open(url+pushdata, '_blank','width=1,height=1');
 

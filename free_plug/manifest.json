@@ -5,7 +5,7 @@
     "manifest_version": 3,
     "action": {
       "default_popup": "hello.html",
-      "default_icon": "hello_extensions.png",
+      "default_icon": "logo.png",
       "default_title": "Musuc Push Download"
     },
 
@@ -15,7 +15,6 @@
       "storage",
       "scripting",
       "tabs",
-      "notifications",
       "pageCapture",
       "alarms"
     ],
@@ -26,6 +25,7 @@
             "*://tool.liumingye.cn/*"
           ],
           "js": [
+            "./pako.es5.js",
             "./jquery.min.js",
             "./content_index.js"
           ],
