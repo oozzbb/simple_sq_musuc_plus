@@ -215,6 +215,9 @@ public class DownloadUtils {
         //默认为flase 即失败
         boolean result = false;
         try {
+            if (!file.exists()){
+                file.getParentFile().mkdirs();
+            }
             OutputStream os = new FileOutputStream(file);
             os.write(inputStream.readAllBytes());
             os.close();

@@ -4,11 +4,9 @@ import ch.qos.logback.core.encoder.ByteArrayUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.ejlchina.data.Mapper;
-import com.ejlchina.okhttps.HTTP;
-import com.ejlchina.okhttps.HttpResult;
-import com.ejlchina.okhttps.OkHttps;
+import com.ejlchina.okhttps.*;
 
-import com.ejlchina.okhttps.SHttpTask;
+import com.ejlchina.okhttps.Process;
 import com.sqmusicplus.plug.qq.config.QQConfig;
 import com.sqmusicplus.plug.qq.entity.QQSearchEntity;
 import com.sqmusicplus.plug.qq.enums.QQSearchType;
@@ -37,6 +35,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static cn.hutool.crypto.digest.DigestUtil.md5;
 
@@ -79,11 +78,41 @@ class SimpleSqMusucPlusApplicationTests {
     @Test
     public void contextLoads() throws IOException, ScriptException, NoSuchMethodException {
 
+        String url = "https://m.lanzouj.com/i6h9c1lbimdc";
+        String downloadUrl = getDownloadUrl(url);
 
-String url ="https://c1026.lanosso.com/c91fad0ef1c23a52c83ed989e1b7955d/669e53a7/2022/11/30/0c986867539412b76408d20c1ef899c2.mp3?fn=%E7%94%9F%E3%81%8D%E3%81%A6%E3%81%93%E3%81%9D%20(%E6%AD%A3%E5%9B%A0%E6%B4%BB%E7%9D%80)-Kiroro.320.mp3";
 
-        boolean download = DownloadUtils.download(url, new File("D:\\temp\\sq\\aaaa.mp3"));
-        System.out.println(download);
+        File file = new File("D:\\temp\\sq\\download\\ccc.flac");
+//        boolean download = DownloadUtils.download(url, file);
+        HashMap<String, String> stringStringHashMap = new HashMap<>();
+        stringStringHashMap.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+
+//        java.util.function.Consumer<Process> onProcess,Consumer<File> onSuccess,Consumer< Download.Failure> onFailure,Consumer<Download.Status> onComplete
+
+        DownloadUtils.download(downloadUrl, file, stringStringHashMap,onProcess->{
+            long doneBytes = onProcess.getDoneBytes();   // 已下载字节数
+            long totalBytes = onProcess.getTotalBytes(); // 总共的字节数
+            double rate = onProcess.getRate();           // 已下载的比例
+            boolean isDone = onProcess.isDone();         // 是否下载完成
+            System.out.println("下载中");
+            System.out.println("已下载字节数："+doneBytes);
+            System.out.println("总共的字节数"+totalBytes);
+            System.out.println("已下载的比例"+rate);
+            System.out.println("是否下载完成"+isDone);
+
+        },onSuccess->{
+            System.out.println("下载成功");
+
+        },onFailure -> {
+            System.out.println("下载失败:");
+            onFailure.getException().printStackTrace();
+
+        },onComplete->{
+            System.out.println("下载失败XXX:");
+            System.out.println(onComplete);
+        });
+
+//        System.out.println(download);
 //        String word1 = "不枉此生(电视剧《雪山飞狐》主题曲)";
 //        String word2 = "不枉此生";
 //        double cilinSimilarityResult = Similarity.cilinSimilarity(word1, word2);
@@ -210,6 +239,41 @@ String url ="https://c1026.lanosso.com/c91fad0ef1c23a52c83ed989e1b7955d/669e53a7
 
         } catch (IOException e) {
 
+        }
+
+    }
+
+    String getDownloadUrl(String musicurl){
+        //判断是否是蓝奏地址还是其他地址
+        if (musicurl.contains("lanzou")){
+            //转直连再下载
+
+            OkHttpClient client = new OkHttpClient();
+
+            Request request = new Request.Builder()
+                    .url("https://lz.qaiu.top/json/parser?url="+musicurl)
+                    .get()
+                    .build();
+
+            try {
+                Response response = client.newCall(request).execute();
+                String string = response.body().string();
+                JSONObject jsonObject = JSONObject.parseObject(string);
+                Integer code = jsonObject.getInteger("code");
+                if (code==200){
+                    String url = jsonObject.getString("data");
+                    return url;
+                }else{
+                    return null;
+                }
+            } catch (IOException e) {
+                return null;
+            }
+
+
+        }else{
+            //musicId
+            return musicurl;
         }
 
     }

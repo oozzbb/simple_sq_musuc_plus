@@ -12,8 +12,15 @@ import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.CannotWriteException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.audio.flac.FlacFileReader;
+import org.jaudiotagger.audio.flac.FlacFileWriter;
+import org.jaudiotagger.audio.mp3.MP3FileReader;
+import org.jaudiotagger.audio.mp3.MP3FileWriter;
+import org.jaudiotagger.audio.ogg.OggFileReader;
+import org.jaudiotagger.audio.ogg.OggFileWriter;
 import org.jaudiotagger.tag.*;
 import org.jaudiotagger.tag.datatype.Artwork;
+import org.jaudiotagger.tag.flac.FlacTag;
 import org.jaudiotagger.tag.id3.ID3v1Tag;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
 import ws.schild.jave.EncoderException;
@@ -56,10 +63,44 @@ public class MusicUtils {
 
     public static  synchronized MultimediaInfo setMediaFileInfo(File file, String title, String album, String artist, String comment, String lyrics, File image) throws TagException, CannotReadException, InvalidAudioFrameException, ReadOnlyFileException, IOException, CannotWriteException {
         try {
-            AudioFile af = AudioFileIO.read(file);
+            AudioFile af =null;
+            String s = FileTypeUtils.checkType(file);
+            if (s.contains("flac")){
+                FlacFileReader flacFileReader = new FlacFileReader();
+                af = flacFileReader.read(file);
+            }else if (s.contains("wma")||s.contains("wav")||s.contains("ape")){
+                return null;
+            }else if (s.contains("ogg")){
+                OggFileReader oggFileReader = new OggFileReader();
+                af = oggFileReader.read(file);
+
+            }else {
+                MP3FileReader mp3FileReader = new MP3FileReader();
+                af = mp3FileReader.read(file);
+            }
+
+//            AudioFile af = AudioFileIO.read(file);
             Tag tag = af.getTag();
-            if (tag instanceof ID3v1Tag) {
-                tag = new ID3v24Tag();
+//            if (tag instanceof ID3v1Tag) {
+//                tag = new ID3v24Tag();
+//            }
+            if (image != null && image.exists()) {
+                try {
+                    BufferedImage bufferedImage = ImageIOUtils.read(image);
+                    ImgUtil.write(bufferedImage, image);
+                    Artwork firstArtwork = Artwork.createArtworkFromFile(image);
+                    tag.setField(firstArtwork);
+                } catch (Exception e) {
+                    try {
+                        Artwork firstArtwork = Artwork.createArtworkFromFile(image);
+                        tag.setField(firstArtwork);
+                    }  catch (Exception fex) {
+                        BufferedImage bufferedImage = ImageIOUtils.read(image);
+                        ImgUtil.write(bufferedImage, image);
+                        Artwork firstArtwork = Artwork.createArtworkFromFile(image);
+                        tag.setField(firstArtwork);
+                    }
+                }
             }
             tag.setField(FieldKey.TITLE, title.trim());
             tag.setField(FieldKey.ALBUM, album.trim());
@@ -74,51 +115,26 @@ public class MusicUtils {
                     throw new RuntimeException(e);
                 }
             }
-            if (image != null && image.exists()) {
-                if (FileTypeUtils.checkType(image).contains("webp")){
-                    File jpgimage = new File(image.getAbsolutePath().replace(".webp", ".jpg"));
-                    image = ImageIOUtils.convertWebpToJpeg(image, jpgimage);
-                }
-                try {
-                    Artwork firstArtwork = tag.getFirstArtwork();
-                    firstArtwork.setFromFile(image);
-                    tag.setField(firstArtwork);
-                } catch (Exception e) {
-                    try {
-                        Artwork firstArtwork = Artwork.createArtworkFromFile(image);
-                        tag.setField(firstArtwork);
-                    } catch (UnsupportedOperationException ex) {
-                        tag = new ID3v24Tag();
-                        tag.setField(FieldKey.TITLE, title.trim());
-                        tag.setField(FieldKey.ALBUM, album.trim());
-                        tag.setField(FieldKey.ARTIST, artist.trim());
-                        tag.setField(FieldKey.COMMENT, comment.trim());
-                        Artwork artworkFromFile = Artwork.createArtworkFromFile(image);
-                        tag.setField(artworkFromFile);
-                        if (StringUtils.isNotEmpty(lyrics)) {
-                            tag.setField(FieldKey.LYRICS, lyrics);
-                        }
-                    } catch (FieldDataInvalidException fex) {
-                        BufferedImage bufferedImage = ImageIOUtils.read(image);
-                        ImgUtil.write(bufferedImage, image);
-                        Artwork firstArtwork = Artwork.createArtworkFromFile(image);
-                        tag.setField(firstArtwork);
-                    } catch (Exception ale) {
-                        tag.setField(FieldKey.TITLE, title.trim());
-                        tag.setField(FieldKey.ALBUM, album.trim());
-                        tag.setField(FieldKey.ARTIST, artist.trim());
-                        tag.setField(FieldKey.COMMENT, comment.trim());
-                        if (StringUtils.isNotEmpty(lyrics)) {
-                            tag.setField(FieldKey.LYRICS, lyrics);
-                        }
-                    }
-                }
 
-            }
             af.setTag(tag);
-            AudioFileIO.write(af);
+//            af.commit();
+//            AudioFileIO.write(af);
+
+
+            if (s.contains("flac")){
+                FlacFileWriter flacFileWriter = new FlacFileWriter();
+                flacFileWriter.write(af);
+            }else if (s.contains("ogg")){
+                OggFileWriter oggFileWriter = new OggFileWriter();
+                oggFileWriter.write(af);
+
+            }else {
+                MP3FileWriter mp3FileWriter = new MP3FileWriter();
+                mp3FileWriter.write(af);
+            }
             return null;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

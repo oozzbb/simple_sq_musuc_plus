@@ -115,7 +115,7 @@ public class ImageIOUtils {
                return webpFile;
             }
             return jpgFile;
-        } catch (IOException e) {
+        } catch (Exception e) {
             return webpFile;
         }
 

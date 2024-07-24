@@ -349,6 +349,10 @@ public class FreeMp3Hander {
 //            log.debug("下载失败---->{}", musicName);
 //        }
 
+
+
+
+
         DownloadUtils.download(musicUrl, type, stringStringHashMap,onSuccess->{
 
 
@@ -395,36 +399,57 @@ public class FreeMp3Hander {
                                 FileUtil.del(cover);
                             }
                             suffix = FileTypeUtil.getType(onAlbumImg);
-                            File copy = FileUtil.copy(onAlbumImg, new File(imagePath + File.separator + "cover." + suffix), true);
+                            onAlbumImg= FileUtil.rename(onAlbumImg, "cover." + suffix, true);
+//                            File copy = FileUtil.copy(onAlbumImg, new File(imagePath + File.separator + "cover." + suffix), true);
                             FileUtil.copy(onAlbumImg, new File(imagePath + File.separator + "album."+suffix), true);
-                            albumfile.set(copy);
+//                            albumfile.set(onAlbumImg);
                         } catch (Exception e) {
+                            e.printStackTrace();
                             FileUtil.del(onAlbumImg);
                         }finally {
                             try {
                                 File parentFile = onAlbumImg.getParentFile();
-                                FileUtil.del(onAlbumImg);
                                 boolean dirEmpty = FileUtil.isDirEmpty(parentFile);
                                 if (dirEmpty) {
                                     FileUtil.del(parentFile);
                                 }
                             } catch (IORuntimeException e) {
-
+                                e.printStackTrace();
                             }
                         }
 
+                        //写入标签
+                        extracted(finalMusicName, finalAlbumname, StringUtils.join(artists,"&"), lyricStr,onSuccess, onAlbumImg);
+                        //根据文件获取自己的后缀
+                        String ext = FileTypeUtils.checkType(onSuccess);
+                        String prefix = FileUtil.getPrefix(onSuccess);
+                        //修改文件后缀
+                        FileUtil.rename(onSuccess, prefix + ext, false, true);
                     });
+
                 } catch (Exception e) {
+                    e.printStackTrace();
+                    //写入标签
+                    extracted(finalMusicName, finalAlbumname, StringUtils.join(artists,"&"), lyricStr,onSuccess, null);
+                    //根据文件获取自己的后缀
+                    String ext = FileTypeUtils.checkType(onSuccess);
+                    String prefix = FileUtil.getPrefix(onSuccess);
+                    //修改文件后缀
+                    FileUtil.rename(onSuccess, prefix + ext, false, true);
                 }
+            }else{
+
+                //写入标签
+                extracted(finalMusicName, finalAlbumname, StringUtils.join(artists,"&"), lyricStr,onSuccess, albumfile.get());
+                //根据文件获取自己的后缀
+                String ext = FileTypeUtils.checkType(onSuccess);
+                String prefix = FileUtil.getPrefix(onSuccess);
+                //修改文件后缀
+                FileUtil.rename(onSuccess, prefix + ext, false, true);
             }
-            //根据文件获取自己的后缀
-            String ext = FileTypeUtils.checkType(onSuccess);
-            String prefix = FileUtil.getPrefix(onSuccess);
-            //修改文件后缀
-            onSuccess = FileUtil.rename(onSuccess, prefix + ext, false, true);
-            //写入标签
-            extracted(finalMusicName, finalAlbumname, StringUtils.join(artists,"&"), lyricStr,onSuccess, albumfile.get());
+
         },onFailure -> {
+            onFailure.getException().printStackTrace();
             log.debug("下载失败{}", finalMusicName);
             throw new RuntimeException("下载失败(下载中出现问题):" + finalMusicName);
         });

@@ -4,6 +4,7 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sqmusicplus.base.entity.*;
 import com.sqmusicplus.base.entity.vo.*;
@@ -21,9 +22,7 @@ import com.sqmusicplus.plug.netease.hander.NeteaseHander;
 import com.sqmusicplus.plug.qq.hander.QQHander;
 import com.sqmusicplus.plug.utils.TypeUtils;
 import com.sqmusicplus.base.service.SqConfigService;
-import com.sqmusicplus.utils.MusicUtils;
-import com.sqmusicplus.utils.OkHttpUtils;
-import com.sqmusicplus.utils.StringUtils;
+import com.sqmusicplus.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -561,19 +560,25 @@ public class ALLController {
 
 
     @GetMapping(value = "/download/freemp3",produces = MediaType.TEXT_HTML_VALUE)
-    public String freemp3DownloadGet(@RequestParam String downloadurl,
-                                     @RequestParam String musicname,
-                                     @RequestParam String musicalbumName,
-                                     @RequestParam String musicartistName,
-                                     @RequestParam String musicimage,
-                                     @RequestParam String musiclyrc,
-                                     @RequestParam String sqmusictoken
-    ) throws Exception {
+    public String freemp3DownloadGet(@RequestParam String data) throws Exception {
+
+        byte[] receive = PakoUtil.receive(data);
+        byte[] decompress = ZLibUtils.decompress(receive);
+        String s = new String(decompress);
+        JSONObject jsonObject = JSONObject.parseObject(s);
+        String musicname = jsonObject.getString("musicname");
+        String musicartistName = jsonObject.getString("musicartistName");
+        String musicalbumName = jsonObject.getString("musicalbumName");
+        String downloadurl = jsonObject.getString("downloadurl");
+        String musicimage = jsonObject.getString("musicimage");
+        String musiclyrc = jsonObject.getString("musiclyrc");
+        String sqmusictoken = jsonObject.getString("sqmusictoken");
+
+
         Object loginIdByToken = StpUtil.getLoginIdByToken(sqmusictoken);
         if(loginIdByToken == null){
             return AjaxResult.error("登录过期").toString();
         }
-        String redirectUrl = OkHttpUtils.getRedirectUrl(downloadurl);
         String[] split = musicname.split("-");
         String musicName = null;
         try {
@@ -601,6 +606,12 @@ public class ALLController {
         String finalArtistName = artistName;
         String finalMusicalbumName = musicalbumName;
         threadPoolTaskExecutor.execute(() -> {
+            String redirectUrl = null;
+            try {
+                redirectUrl = OkHttpUtils.getRedirectUrl(downloadurl);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             DownloadEntity download = freeMp3Hander.download(finalMusicName, finalArtistName, finalMusicalbumName, musiclyrc, musicimage, redirectUrl);
             downloadInfoService.add(MusicUtils.downloadEntitytoDownloadInfoTo(download));
         });

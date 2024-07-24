@@ -1,6 +1,7 @@
 package com.sqmusicplus.utils;
 
 import cn.hutool.core.io.FileTypeUtil;
+import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.io.IoUtil;
 import org.apache.tika.Tika;
 import org.apache.tika.mime.MimeType;
@@ -56,9 +57,12 @@ public class FileTypeUtils {
      MIDI (mid)，文件头：4D546864
      */
     public static String checkType(File file) {
-        String type = FileTypeUtil.getType(file,false);
-        if (type != null){
-            return "."+type;
+        try {
+            String type = FileTypeUtil.getType(file,false);
+            if (StringUtils.isNotBlank(type)){
+                return "."+type;
+            }
+        } catch (IORuntimeException e) {
         }
 
         Tika tika = new Tika();

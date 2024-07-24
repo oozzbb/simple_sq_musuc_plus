@@ -193,7 +193,7 @@ public abstract class SearchHanderAbstract implements SearchHander, Serializable
      * @param albumfile
      * @param downloadEntity
      */
-    private synchronized void extracted(Music music, File onSuccess, File albumfile, DownloadEntity downloadEntity) {
+    private  void extracted(Music music, File onSuccess, File albumfile, DownloadEntity downloadEntity) {
         //创建歌词
         try {
             if (StringUtils.isNotEmpty(music.getMusicLyric())) {
