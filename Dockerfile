@@ -9,7 +9,7 @@ COPY src/main/resources/sqlite/sqmusic.db /cache/sqmusic.db
 
 RUN mvn clean package
 
-From amazoncorretto:17.0.12-alpine3.19
+From mcr.microsoft.com/openjdk/jdk:17-ubuntu
 
 WORKDIR /app
 
