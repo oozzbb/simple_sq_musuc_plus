@@ -244,12 +244,17 @@
             <version>2.9.2</version>
         </dependency>
 <!--&lt;!&ndash;webp图片格式支持&ndash;&gt;-->
-        <dependency>
-            <groupId>org.sejda.imageio</groupId>
-            <artifactId>webp-imageio</artifactId>
-            <version>0.1.6</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.sejda.imageio</groupId>-->
+<!--            <artifactId>webp-imageio</artifactId>-->
+<!--            <version>0.1.6</version>-->
+<!--        </dependency>-->
 
+        <dependency>
+            <groupId>com.github.usefulness</groupId>
+            <artifactId>webp-imageio</artifactId>
+            <version>0.8.0</version>
+        </dependency>
 
 
     </dependencies>
