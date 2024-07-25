@@ -393,7 +393,11 @@ public class FreeMp3Hander {
                             if(suffix.contains("webp")){
                                 cover = onAlbumImg.getAbsolutePath();
                                 File jpgimage = new File(onAlbumImg.getAbsolutePath().replace(".webp", ".jpg"));
-                                onAlbumImg = ImageIOUtils.convertWebpToJpeg(onAlbumImg, jpgimage);
+                                boolean b = ImageIOUtils.webpToJpg(onAlbumImg, jpgimage);
+                                if (b){
+                                    onAlbumImg = jpgimage;
+                                }
+
                             }
                             if (!FileTypeUtil.getType(onAlbumImg).contains("webp")){
                                 FileUtil.del(cover);

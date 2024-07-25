@@ -1,5 +1,7 @@
 package com.sqmusicplus.utils;
 
+import com.hellokaton.webp.WebpIO;
+
 import javax.imageio.*;
 import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
@@ -17,6 +19,23 @@ import java.util.Iterator;
  * Description:
  */
 public class ImageIOUtils {
+
+
+
+    public static boolean webpToJpg(File webpFile, File jpgFile){
+//        String src  = "a.webp";
+//        String dest = "a.png";
+        try {
+            WebpIO.create().toNormalImage(webpFile, jpgFile);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+//
+//        WebpIO.create().toWEBP("hello.png", "hello.webp");
+    }
+
+
     public static BufferedImage read(File input) throws IOException {
         if (input == null) {
             throw new IllegalArgumentException("input == null!");
