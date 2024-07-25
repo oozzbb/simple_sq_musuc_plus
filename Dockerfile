@@ -9,7 +9,7 @@ COPY src/main/resources/sqlite/sqmusic.db /cache/sqmusic.db
 
 RUN mvn clean package
 
-From ubuntu/jre:17_edge
+From joengenduvel/jre17:latest
 
 WORKDIR /app
 
