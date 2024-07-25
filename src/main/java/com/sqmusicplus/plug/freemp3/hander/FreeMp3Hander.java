@@ -402,7 +402,6 @@ public class FreeMp3Hander {
                             onAlbumImg= FileUtil.rename(onAlbumImg, "cover." + suffix, true);
 //                            File copy = FileUtil.copy(onAlbumImg, new File(imagePath + File.separator + "cover." + suffix), true);
                             FileUtil.copy(onAlbumImg, new File(imagePath + File.separator + "album."+suffix), true);
-//                            albumfile.set(onAlbumImg);
                         } catch (Exception e) {
                             e.printStackTrace();
                             FileUtil.del(onAlbumImg);

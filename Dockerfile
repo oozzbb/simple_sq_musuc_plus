@@ -9,7 +9,7 @@ COPY src/main/resources/sqlite/sqmusic.db /cache/sqmusic.db
 
 RUN mvn clean package
 
-From eclipse-temurin:17-jre-alpine
+From ubuntu/jre:17_edge
 
 WORKDIR /app
 

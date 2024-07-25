@@ -87,6 +87,9 @@ public class MusicUtils {
             if (image != null && image.exists()) {
                 try {
                     BufferedImage bufferedImage = ImageIOUtils.read(image);
+                    if (bufferedImage == null){
+                        return null;
+                    }
                     ImgUtil.write(bufferedImage, image);
                     Artwork firstArtwork = Artwork.createArtworkFromFile(image);
                     tag.setField(firstArtwork);
@@ -96,9 +99,14 @@ public class MusicUtils {
                         tag.setField(firstArtwork);
                     }  catch (Exception fex) {
                         BufferedImage bufferedImage = ImageIOUtils.read(image);
+                        if (bufferedImage == null){
+                            return null;
+                        }
                         ImgUtil.write(bufferedImage, image);
                         Artwork firstArtwork = Artwork.createArtworkFromFile(image);
                         tag.setField(firstArtwork);
+                    }catch (Error exc) {
+                        System.out.println("Caught an error: " + e.getMessage());
                     }
                 }
             }

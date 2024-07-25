@@ -29,7 +29,12 @@ public class ImageIOUtils {
         if (stream == null) {
             throw new IIOException("Can't create an ImageInputStream!");
         }
-        BufferedImage bi = read(stream);
+        BufferedImage bi = null;
+        try {
+            bi = read(stream);
+        } catch (Exception e) {
+            return null;
+        }
         if (bi == null) {
             stream.close();
         }
@@ -37,7 +42,7 @@ public class ImageIOUtils {
     }
 
     private static BufferedImage read(ImageInputStream stream)
-            throws IOException {
+            throws Exception {
         if (stream == null) {
             throw new IllegalArgumentException("stream == null!");
         }
@@ -47,15 +52,21 @@ public class ImageIOUtils {
             return null;
         }
 
-        final ImageReader reader = iter.next();
-        ImageReadParam param = reader.getDefaultReadParam();
-        reader.setInput(stream, true, true);
         BufferedImage bi;
+        final ImageReader reader = iter.next();
+
         try {
+            ImageReadParam param = reader.getDefaultReadParam();
+            reader.setInput(stream, true, true);
             bi = reader.read(0, param);
-        } catch (IIOException e) {
+        } catch ( Exception e) {
             Raster raster = reader.readRaster(0, null);
             bi = createJPEG4(raster);
+        } catch (Error e) {
+            // handle Errors here, including NoSuchFieldError
+            System.out.println("Caught an error: " + e.getMessage());
+            // usually you would not continue execution after catching an Error
+            return null;
         } finally {
             reader.dispose();
             stream.close();
