@@ -519,28 +519,32 @@ public class ALLController {
     @SaCheckLogin
     @PostMapping("/download/freemp3")
     public String freemp3Download(@Valid  @RequestBody PlugFreeMp3DownloadEntity data) throws Exception {
-
+        String musicname = data.getMusicname();
+        String musicartistName = data.getMusicartistName();
+        String musicalbumName = data.getMusicalbumName();
         String downloadurl = data.getDownloadurl();
-        String redirectUrl = OkHttpUtils.getRedirectUrl(downloadurl);
-        String[] split = data.getMusicname().split("-");
+        String musiclyrc = data.getMusiclyrc();
+        String musicimage = data.getMusicimage();
+
+
+        String[] split = musicname.split("-");
         String musicName = null;
         try {
             musicName = split[0].trim();
         } catch (Exception e) {
-            musicName = data.getMusicname();
+            musicName = musicname;
         }
 
         String artistName = null;
-        if (StringUtils.isBlank(data.getMusicartistName())){
+        if (StringUtils.isBlank(musicartistName)){
             try {
                 artistName = split[1].trim();
             } catch (Exception e) {
                 artistName="";
             }
         }else{
-            artistName = data.getMusicartistName();
+            artistName = musicartistName;
         }
-        String musicalbumName = data.getMusicalbumName();
         if (StringUtils.isBlank(musicalbumName)){
             //网易喜欢搞这种的  酷我是无专辑大户
             musicalbumName = musicName;
@@ -550,12 +554,17 @@ public class ALLController {
         String finalArtistName = artistName;
         String finalMusicalbumName = musicalbumName;
         threadPoolTaskExecutor.execute(() -> {
-            DownloadEntity download = freeMp3Hander.download(finalMusicName, finalArtistName, finalMusicalbumName, data.getMusiclyrc(), data.getMusicimage(), redirectUrl);
+            String redirectUrl = null;
+            try {
+                redirectUrl = OkHttpUtils.getRedirectUrl(downloadurl);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            DownloadEntity download = freeMp3Hander.download(finalMusicName, finalArtistName, finalMusicalbumName, musiclyrc, musicimage, redirectUrl);
             downloadInfoService.add(MusicUtils.downloadEntitytoDownloadInfoTo(download));
         });
 
-
-        return redirectUrl;
+        return "ok";
     }
 
 

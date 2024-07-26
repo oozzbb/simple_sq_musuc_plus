@@ -50,7 +50,7 @@ public class NKwSearchHander extends SearchHanderAbstract {
     @Override
     public PlugSearchResult<PlugSearchMusicResult> querySongByName(SearchKeyData searchKeyData) {
         String searchUrl = config.getSearchUrl();
-        String s = searchUrl.replaceAll("#\\{pn}", searchKeyData.getPageIndex().toString())
+        String s = searchUrl.replaceAll("#\\{pn}", (searchKeyData.getPageIndex()-1)+"")
                 .replaceAll("#\\{searchKey}", searchKeyData.getSearchkey())
                 .replaceAll("#\\{pagesize}", searchKeyData.getPageSize().toString())
                 .replaceAll("#\\{searchType}", KwSearchType.MUSIC.getValue());
@@ -95,7 +95,7 @@ public class NKwSearchHander extends SearchHanderAbstract {
 
     @Override
     public PlugSearchResult<PlugSearchArtistResult> queryArtistByName(SearchKeyData searchKeyData) {
-        String searchUrl = config.getSearchUrl().replaceAll("#\\{pn}", searchKeyData.getPageIndex().toString())
+        String searchUrl = config.getSearchUrl().replaceAll("#\\{pn}", (searchKeyData.getPageIndex()-1)+"")
                 .replaceAll("#\\{pagesize}", searchKeyData.getPageSize().toString())
                 .replaceAll("#\\{searchKey}", searchKeyData.getSearchkey())
                 .replaceAll("#\\{searchType}", KwSearchType.ARTIST.getValue());
@@ -127,7 +127,7 @@ public class NKwSearchHander extends SearchHanderAbstract {
 
     @Override
     public PlugSearchResult<PlugSearchAlbumResult> queryAlbumByName(SearchKeyData searchKeyData) {
-        String searchUrl = config.getSearchUrl().replaceAll("#\\{pn}", searchKeyData.getPageIndex().toString())
+        String searchUrl = config.getSearchUrl().replaceAll("#\\{pn}", (searchKeyData.getPageIndex()-1)+"")
                 .replaceAll("#\\{pagesize}", searchKeyData.getPageSize().toString())
                 .replaceAll("#\\{searchKey}", searchKeyData.getSearchkey())
                 .replaceAll("#\\{searchType}", KwSearchType.ALBUM.getValue());

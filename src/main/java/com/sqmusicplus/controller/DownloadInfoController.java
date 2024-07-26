@@ -32,6 +32,7 @@ public class DownloadInfoController {
     public AjaxResult getDownloadInfo(@PathVariable("type") String type, @PathVariable("pageSize") Integer pageSize, @PathVariable("pageIndex") Integer pageIndex){
         LambdaQueryWrapper<DownloadInfo> downloadInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
         downloadInfoLambdaQueryWrapper.eq(DownloadInfo::getStatus, type);
+        downloadInfoLambdaQueryWrapper.orderByDesc(DownloadInfo::getDownloadTime);
         Page<DownloadInfo> page = downloadInfoService.page(new Page<>(pageIndex, pageSize),downloadInfoLambdaQueryWrapper);
         return AjaxResult.success(page);
     }
