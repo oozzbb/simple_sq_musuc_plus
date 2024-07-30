@@ -4,8 +4,8 @@ spring:
 
   datasource:
 #    url: jdbc:sqlite::resource:sqlite/sqmusic.db
-    url: jdbc:sqlite:/D:\\music\\sqmusic.db
-#    url: jdbc:sqlite:/cache/sqmusic.db
+#    url: jdbc:sqlite:/D:\\music\\sqmusic.db
+    url: jdbc:sqlite:/cache/sqmusic.db
     driver-class-name: org.sqlite.JDBC
     username:
     password:
