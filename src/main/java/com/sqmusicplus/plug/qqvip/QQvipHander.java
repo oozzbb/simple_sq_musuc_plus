@@ -1,11 +1,16 @@
 package com.sqmusicplus.plug.qqvip;
 
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ejlchina.data.Mapper;
+import com.ejlchina.okhttps.HTTP;
+import com.ejlchina.okhttps.HttpResult;
+import com.ejlchina.okhttps.HttpUtils;
 import com.ejlchina.okhttps.OkHttps;
 import com.sqmusicplus.base.entity.*;
+import com.sqmusicplus.base.service.SqConfigService;
 import com.sqmusicplus.plug.base.PlugBrType;
 import com.sqmusicplus.plug.base.hander.SearchHanderAbstract;
 import com.sqmusicplus.plug.entity.*;
@@ -42,25 +47,19 @@ public class QQvipHander extends SearchHanderAbstract {
 
     @Autowired
     private QQVipConfig qqvipConfig;
-    public QQMusicInfo qqMusicInfo=new QQMusicInfo();
+
 
     @Autowired
     private QQHander qqHander;
+
+    @Autowired
+    private SqConfigService configService;
 
 
     public void initPlug(){
         QQVipSearchEntity qqSearchEntity = new QQVipSearchEntity();
         qqSearchEntity.setPlugName("qqvip");
         qqHander.setQqSearchEntity(qqSearchEntity);
-        // 设置网易云音乐的地址
-        MusicEnum.setBASE_URL_QQMusic(qqvipConfig.getBaseUrl());
-//        if (StringUtils.isEmpty(qqvipConfig.getBaseCookie())){
-//          //直接关闭该功能禁止使用
-//        }else{
-//            if (StringUtils.isNotEmpty(qqvipConfig.getBaseCookie())){
-//                qqMusicInfo.setCookieString(qqvipConfig.getBaseCookie());
-//            }
-//        }
 
     }
 
@@ -204,12 +203,15 @@ public class QQvipHander extends SearchHanderAbstract {
             jsonObject.put("id", musicId);
         }
         jsonObject.put("type", type);
-        String baseUrlQqMusic = MusicEnum.BASE_URL_QQMusic;
-        baseUrlQqMusic+="song/url";
-        System.out.println(baseUrlQqMusic);
-        JSONObject jsonObject1 = qqMusicInfo.songUrl(jsonObject);
+        String baseUrl = qqvipConfig.getBaseUrl();
+        SqConfig configKey = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.baseurl"));
+        if (configKey!=null){
+            baseUrl =  configKey.getConfigValue();
+        }
+        String s = HttpUtil.get(baseUrl + "/song/url", jsonObject);
+        JSONObject jsonObject1 = JSONObject.parseObject(s);
         Integer code = jsonObject1.getInteger("result");
-        if (code!=null&&code==100){
+        if (code!=null&&code.intValue()==100){
             HashMap<String, String> stringStringHashMap = new HashMap<>();
             stringStringHashMap.put("url", jsonObject1.getString("data"));
             stringStringHashMap.put("type", brType.getType());

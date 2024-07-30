@@ -18,6 +18,7 @@ import java.io.Serializable;
  */
 @Data
 @TableName(value = "sq_config")
+
 public class SqConfig implements Serializable {
     public static final String COL_CONFIG_ID = "config_id";
     public static final String COL_CONFIG_NAME = "config_name";

@@ -50,6 +50,10 @@ public class Init implements ApplicationRunner {
     @Autowired
     private NeteaseHander neteaseHander;
 
+    @Value("${qqvip.baseUrl:null}")
+    private String qqVipBaseUrl;
+
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         SqConfig init_download = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.init.download"));
@@ -74,6 +78,25 @@ public class Init implements ApplicationRunner {
         neteaseHander.initPlug();
         qqvipHander.initPlug();
         log.info("当前服务版本->{}", version);
+        if (StringUtils.isNotBlank(qqVipBaseUrl)&& !qqVipBaseUrl.equals("null")) {
+           //如果最后有/则去掉
+            qqVipBaseUrl = qqVipBaseUrl.replaceAll("/$", "");
+            SqConfig configKey = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.baseurl"));
+            if (configKey!=null&&!configKey.equals(qqVipBaseUrl)) {
+                log.info("发现qqvip基础地址与数据库不同更新为配置地址->{}", qqVipBaseUrl);
+
+                configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.qqvip.baseurl").set("config_value", qqVipBaseUrl));
+            }else {
+                SqConfig sqConfig = new SqConfig();
+                sqConfig.setConfigKey("plug.qqvip.baseurl");
+                sqConfig.setConfigValue(qqVipBaseUrl);
+                sqConfig.setConfigName("QQvip基础url");
+                sqConfig.setType("input");
+                configService.save(sqConfig);
+                log.info("新增QQvip配置->{}", qqVipBaseUrl);
+            }
+        }
+
 
 
 

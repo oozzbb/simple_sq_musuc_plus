@@ -1,5 +1,7 @@
 
 ## 更新
+修复QQvip下载部分问题
+
 1.增加QQvip下载需要买了vip并且部署了 https://github.com/jsososo/QQMusicApi 服务 登录账号密码后使用application-qqvip.yml配置url即可（如没配置请不要在网页中使用此功能！）
 
 2.增加freeMp3的插件下载支持  

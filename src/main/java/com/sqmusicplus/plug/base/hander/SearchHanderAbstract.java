@@ -62,6 +62,9 @@ public abstract class SearchHanderAbstract implements SearchHander, Serializable
             //下载位置
             String basepath = music.getMusicArtists().trim() + File.separator + music.getMusicAlbum().trim() + File.separator;
             HashMap<String, String> stringStringHashMap = searchHander.getDownloadUrl(downloadEntity.getMusicid() + "", downloadEntity.getBrType());
+          if(stringStringHashMap==null){
+              throw new RuntimeException("(未获取到播放链接)下载失败:" + music.getMusicName());
+          }
             File type = new File(file, basepath + music.getMusicName().trim() + " - " + music.getMusicArtists().trim() + "." + stringStringHashMap.get("type"));
             log.debug("开始下载---->{}", music.getMusicName());
             //创建任务
@@ -89,7 +92,7 @@ public abstract class SearchHanderAbstract implements SearchHander, Serializable
                 //人物图片
                 File Artistsfile = FileUtils.findFile(downliadpath + File.separator ,"cover");
 
-                if (!Artistsfile.exists() && !downloadEntity.getAudioBook()) {
+                if (Artistsfile==null||(!Artistsfile.exists() && !downloadEntity.getAudioBook())) {
                     try {
                         DownloadUtils.download(downloadurl, downliadpath, onArtistsPhoto -> {
                             try {
@@ -134,13 +137,13 @@ public abstract class SearchHanderAbstract implements SearchHander, Serializable
                 }
                 File albumfile = FileUtils.findFile(imagePath + File.separator ,"cover");
                 //专辑图片下载与标签写入
-                if (!albumfile.exists() && downloadalubimage) {
+                if (albumfile==null||(!albumfile.exists() && downloadalubimage)){
                     try {
                         DownloadUtils.download(albumImg, imagePath, onAlbumImg -> {
                             File cover = null;
                             try {
                                 String suffix = FileTypeUtil.getType(onAlbumImg);
-                                FileUtil.copy(onAlbumImg, new File(imagePath + File.separator + "cover."+suffix), true);
+                                onAlbumImg = FileUtil.rename(onAlbumImg, "cover." + suffix, true);
                                 FileUtil.copy(onAlbumImg, new File(imagePath + File.separator + "album."+suffix), true);
                                 if (downloadEntity.getAudioBook()) {
                                     FileUtil.copyFile(cover, Artistsfile);
@@ -150,7 +153,6 @@ public abstract class SearchHanderAbstract implements SearchHander, Serializable
                             }finally {
                                 try {
                                     File parentFile = onAlbumImg.getParentFile();
-                                    FileUtil.del(onAlbumImg);
                                     boolean dirEmpty = FileUtil.isDirEmpty(parentFile);
                                     if (dirEmpty) {
                                         FileUtil.del(parentFile);
@@ -160,7 +162,7 @@ public abstract class SearchHanderAbstract implements SearchHander, Serializable
                                 }
                             }
                             album.setAlbumImg("cover");
-                            extracted(music, onSuccess, cover, downloadEntity);
+                            extracted(music, onSuccess, onAlbumImg, downloadEntity);
                         });
                     } catch (Exception e) {
                         extracted(music, onSuccess, albumfile, downloadEntity);
