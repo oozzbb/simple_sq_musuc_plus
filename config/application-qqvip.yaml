@@ -1,5 +1,5 @@
 qqvip:
-  open: true
+  open: false
   baseUrl: http://127.0.0.1:3300
   qq: 123456
 
