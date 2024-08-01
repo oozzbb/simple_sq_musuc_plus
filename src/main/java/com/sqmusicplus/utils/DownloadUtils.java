@@ -75,9 +75,10 @@ public class DownloadUtils {
                             return chain.proceed(chain.request());
                         } catch (Exception e) {
                             if (retryTimes >= GlobalStatic.SUBSONIC_SYNC_MAXIMUM_STATISTICS) {
-                                throw e;
+                             log.error("多次请求失败！：{}",chain.request().url().url().toString());
+                                throw new RuntimeException("多次请求失败:"+chain.request().url().url().toString());
                             }
-                            log.debug("超时重试第{}次！",retryTimes);
+                            log.info("超时重试第{}次！",retryTimes);
                             retryTimes++;
                         }
                     }

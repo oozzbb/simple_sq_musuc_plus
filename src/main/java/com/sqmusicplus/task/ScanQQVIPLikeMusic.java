@@ -48,7 +48,7 @@ public class ScanQQVIPLikeMusic {
 
     @Autowired
     private DownloadInfoService downloadInfoService;
-    @Scheduled(cron="0 0/1 * * * ? ")
+    @Scheduled(cron="0 0/10 * * * ? ")
     public void excute(){
         SqConfig qqopenconfigKey = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.open"));
 

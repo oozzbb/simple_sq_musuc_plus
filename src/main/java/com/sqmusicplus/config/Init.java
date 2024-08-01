@@ -145,7 +145,12 @@ public class Init implements ApplicationRunner {
 
 
         if (qqconfigKey != null && configKey != null && qqopenconfigKey != null && qqopenconfigKey.getConfigValue() != null && configKey.getConfigValue() != null && qqconfigKey.getConfigValue() != null) {
-            FreeCookieUtil.refreshCookies(qqconfigKey.getConfigValue(), configKey.getConfigValue());
+            try {
+                FreeCookieUtil.refreshCookies(qqconfigKey.getConfigValue(), configKey.getConfigValue());
+            } catch (Exception e) {
+                configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.qqvip.open").set("config_key", "false"));
+                log.error("获取QQvip失败请检查ip和qq是否准确已自动关闭该插件");
+            }
         }
 
     }
