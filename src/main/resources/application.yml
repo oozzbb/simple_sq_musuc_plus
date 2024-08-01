@@ -4,8 +4,8 @@ spring:
 
   datasource:
 #    url: jdbc:sqlite::resource:sqlite/sqmusic.db
-#    url: jdbc:sqlite:/D:\\music\\sqmusic.db
-    url: jdbc:sqlite:/cache/sqmusic.db
+    url: jdbc:sqlite:/D:\\music\\sqmusic.db
+#    url: jdbc:sqlite:/cache/sqmusic.db
     driver-class-name: org.sqlite.JDBC
     username:
     password:
@@ -58,4 +58,4 @@ sa-token:
   # 是否输出操作日志
   is-log: false
 
-version: 2.11.10
+version: 2.12.1

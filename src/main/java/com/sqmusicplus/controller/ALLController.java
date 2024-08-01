@@ -453,7 +453,13 @@ public class ALLController {
                     continue;
                 }
             }
-            DownloadEntity downloadEntity = searchHanderAbstract.downloadSong(music, PlugBrType.KW_FLAC_2000, "");
+            PlugBrType plugType;
+            if (StringUtils.isEmpty(downlaodArtis.getPlugTypeValue())){
+                plugType = TypeUtils.getPlugType(downlaodArtis.getPlugType(), downlaodArtis.getBr());
+            }else{
+                plugType = TypeUtils.getPlugType(downlaodArtis.getPlugType(), downlaodArtis.getPlugTypeValue());
+            }
+            DownloadEntity downloadEntity = searchHanderAbstract.downloadSong(music, plugType, "");
             DownloadInfo downloadInfo = MusicUtils.downloadEntitytoDownloadInfoTo(downloadEntity);
             downloadInfos.add(downloadInfo);
         }

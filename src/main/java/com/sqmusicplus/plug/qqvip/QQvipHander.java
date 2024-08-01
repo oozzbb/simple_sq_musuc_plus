@@ -1,5 +1,6 @@
 package com.sqmusicplus.plug.qqvip;
 
+import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -20,14 +21,20 @@ import com.sqmusicplus.plug.qq.enums.QQSearchType;
 import com.sqmusicplus.plug.qq.hander.QQHander;
 import com.sqmusicplus.plug.qqvip.config.QQVipConfig;
 import com.sqmusicplus.plug.qqvip.entity.QQVipSearchEntity;
+import com.sqmusicplus.plug.utils.FreeCookieUtil;
 import com.sqmusicplus.utils.DownloadUtils;
 import com.sqmusicplus.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import top.yumbo.util.music.MusicEnum;
 import top.yumbo.util.music.musicImpl.qq.QQMusicInfo;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,69 +83,6 @@ public class QQvipHander extends SearchHanderAbstract {
 
     @Override
     public PlugSearchResult<PlugSearchMusicResult> querySongByName(SearchKeyData searchKeyData) {
-
-//
-//        JSONObject jsonObject = new JSONObject();
-//        jsonObject.put("key", searchKeyData.getSearchkey());
-//        jsonObject.put("pageNo", searchKeyData.getPageIndex().toString());
-//        jsonObject.put("pageSize", searchKeyData.getPageSize().toString());
-//
-//
-//        JSONObject mapper = qqMusicInfo.search(jsonObject);
-//
-//        int result = mapper.getIntValue("result");
-//        if (result != 100) {
-//            PlugSearchResult<PlugSearchMusicResult> plugSearchResult = new PlugSearchResult<>();
-//            //返回错误
-//            return plugSearchResult;
-//        }
-//        JSONObject data = mapper.getJSONObject("data");
-//        JSONArray list = data.getJSONArray("list");
-//        ArrayList<PlugSearchMusicResult> plugSearchMusicResults = new ArrayList<>();
-//
-//
-//
-//        list.forEach(e->{
-//            JSONObject songsDTO = JSONObject.parseObject(e.toString());
-//            PlugSearchMusicResult plugSearchMusicResult = new PlugSearchMusicResult();
-//
-//            JSONArray singer = songsDTO.getJSONArray("singer");
-//            String artistName = "";
-//            ArrayList<String> strings = new ArrayList<>();
-//            AtomicReference<String> artistid = new AtomicReference<>("");
-//            singer.forEach(e1->{
-//                JSONObject stringsDto = JSONObject.parseObject(e1.toString());
-//                strings.add(stringsDto.getString("name"));
-//                if (StringUtils.isEmpty(artistid.get())){
-//                    artistid.set(stringsDto.getString("mid"));
-//                }
-//            });
-//            String albumImageconfig = qqHander.getConfig().getAlbumImage();
-//            String albumImage = albumImageconfig.replaceAll("#\\{pmid}", songsDTO.getString("albummid"));
-//            String lyricResult = qqHander.getqqSearchEntity().toPlugLyricResult(songsDTO.getString("songmid"),qqHander.getConfig());
-//            artistName=String.join(",",strings);
-//            plugSearchMusicResult.setSearchType(getPlugName());
-//            plugSearchMusicResult.setId(songsDTO.getString("songmid")+","+songsDTO.getString("strMediaMid"));
-//            plugSearchMusicResult.setName(songsDTO.getString("songname"));
-//            plugSearchMusicResult.setArtistName(artistName);
-//            plugSearchMusicResult.setArtistid(artistid.get());
-//            plugSearchMusicResult.setPic(albumImage);
-//            plugSearchMusicResult.setAlbumName(songsDTO.getString("albumname"));
-//            plugSearchMusicResult.setAlbumid(songsDTO.getString("albummid"));
-//            plugSearchMusicResult.setLyricId(songsDTO.getString("songmid"));
-//            plugSearchMusicResult.setLyric(lyricResult);
-//            plugSearchMusicResults.add(plugSearchMusicResult);
-//        });
-//
-//
-//
-//
-//        plugSearchResult.setSearchIndex(data.getInteger("pageNo"));
-//        plugSearchResult.setSearchSize(data.getInteger("pageSize"));
-//        plugSearchResult.setSearchTotal(data.getInteger("total"));
-//        plugSearchResult.setSearchKeyWork(data.getString("key"));
-//        return plugSearchResult;
-
         return qqHander.querySongByName(searchKeyData);
     }
 
@@ -208,15 +152,29 @@ public class QQvipHander extends SearchHanderAbstract {
         if (configKey!=null){
             baseUrl =  configKey.getConfigValue();
         }
-        String s = HttpUtil.get(baseUrl + "/song/url", jsonObject);
-        JSONObject jsonObject1 = JSONObject.parseObject(s);
-        Integer code = jsonObject1.getInteger("result");
-        if (code!=null&&code.intValue()==100){
-            HashMap<String, String> stringStringHashMap = new HashMap<>();
-            stringStringHashMap.put("url", jsonObject1.getString("data"));
-            stringStringHashMap.put("type", brType.getType());
-            stringStringHashMap.put("bit", brType.getBit().toString());
-            return stringStringHashMap;
+        String url = HttpUtil.urlWithForm(baseUrl + "/song/url", jsonObject, Charset.forName("UTF-8"), true);
+        OkHttpClient client = DownloadUtils.getOkHttpClient();
+        try {
+            Request request = new Request.Builder()
+                    .addHeader("Cookie", FreeCookieUtil.getCookieStr())
+                    .url(url)
+                    .get()
+                    .build();
+            Response response = client.newCall(request).execute();
+            String string = response.body().string();
+            JSONObject jsonObject1 = JSONObject.parseObject(string);
+            Integer code = jsonObject1.getInteger("result");
+            if (code!=null&&code.intValue()==100){
+                HashMap<String, String> stringStringHashMap = new HashMap<>();
+                stringStringHashMap.put("url", jsonObject1.getString("data"));
+                stringStringHashMap.put("type", brType.getType());
+                stringStringHashMap.put("bit", brType.getBit().toString());
+                return stringStringHashMap;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error("获取下载地址失败music地址:{}" ,musicId);
+            return null;
         }
         return null;
     }

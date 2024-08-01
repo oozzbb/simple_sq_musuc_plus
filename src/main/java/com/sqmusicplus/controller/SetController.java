@@ -6,10 +6,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.ejlchina.data.Mapper;
+import com.ejlchina.okhttps.HTTP;
 import com.sqmusicplus.config.AjaxResult;
 import com.sqmusicplus.base.entity.SqConfig;
 import com.sqmusicplus.plug.base.PlugBrType;
 import com.sqmusicplus.base.service.SqConfigService;
+import com.sqmusicplus.plug.utils.FreeCookieUtil;
+import com.sqmusicplus.utils.DownloadUtils;
 import com.sqmusicplus.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +59,32 @@ public class SetController {
                 String substring = configValue.substring(0, configValue.length() - 1);
                 config.setConfigValue(substring);
             }
+
         }
+
+        if (config.getConfigKey().equals("plug.qqvip.baseurl")) {
+            if (config.getConfigValue().endsWith("/")) {
+                String configValue = config.getConfigValue();
+                String substring = configValue.substring(0, configValue.length() - 1);
+                config.setConfigValue(substring);
+            }
+
+            SqConfig qqconfig = configService.getOne(new QueryWrapper<SqConfig>().eq(SqConfig.COL_CONFIG_KEY, "plug.qqvip.qq"));
+            FreeCookieUtil.refreshCookies(qqconfig.getConfigValue(), config.getConfigValue());
+
+        }
+        if (config.getConfigKey().equals("plug.qqvip.qq")) {
+            SqConfig urlconfig = configService.getOne(new QueryWrapper<SqConfig>().eq(SqConfig.COL_CONFIG_KEY, "plug.qqvip.baseurl"));
+            FreeCookieUtil.refreshCookies(config.getConfigValue(), urlconfig.getConfigValue());
+        }
+
+
+        if (config.getConfigKey().equals("plug.qqvip.open")) {
+            SqConfig urlconfig = configService.getOne(new QueryWrapper<SqConfig>().eq(SqConfig.COL_CONFIG_KEY, "plug.qqvip.baseurl"));
+            SqConfig qqconfig = configService.getOne(new QueryWrapper<SqConfig>().eq(SqConfig.COL_CONFIG_KEY, "plug.qqvip.qq"));
+            FreeCookieUtil.refreshCookies(qqconfig.getConfigValue(), urlconfig.getConfigValue());
+        }
+
         boolean b = false;
         if (config.getConfigId()==null){
             UpdateWrapper<SqConfig> sqConfigUpdateWrapper = new UpdateWrapper<>();
@@ -66,13 +95,21 @@ public class SetController {
         }
         return AjaxResult.success("成功", b);
     }
+
+    @SaCheckLogin
+    @PostMapping("/refreshQQvipCookie")
+    public AjaxResult refreshQQvipCookies(){
+        SqConfig qqconfig = configService.getOne(new QueryWrapper<SqConfig>().eq(SqConfig.COL_CONFIG_KEY, "plug.qqvip.qq"));
+        SqConfig urlconfig = configService.getOne(new QueryWrapper<SqConfig>().eq(SqConfig.COL_CONFIG_KEY, "plug.qqvip.baseurl"));
+        ArrayList<String> strings = FreeCookieUtil.refreshCookies(qqconfig.getConfigValue(), urlconfig.getConfigValue());
+        return AjaxResult.success("成功", strings);
+    }
+
     @GetMapping("/getSearchType")
     public AjaxResult getSearchType(){
         PlugBrType[] values = PlugBrType.values();
         Map<String, String> collect = Arrays.stream(values).collect(Collectors.toMap(PlugBrType::getPlugName, PlugBrType::getValue));
-
         JSONArray objects = new JSONArray();
-
         Set<Map.Entry<String, String>> entries = collect.entrySet();
         for (Map.Entry<String, String> entry : entries) {
             JSONObject jsonObject = new JSONObject();
@@ -89,6 +126,8 @@ public class SetController {
 
     @GetMapping("selectOption")
     public AjaxResult selectOption(){
+        SqConfig qqopenconfigKey = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.open"));
+
         ArrayList<HashMap<String, String>> hashMaps = new ArrayList<>();
         HashMap<String, String> kwoption = new HashMap<>();
         kwoption.put("value","kw");
@@ -96,9 +135,6 @@ public class SetController {
         HashMap<String, String> QQoption = new HashMap<>();
         QQoption.put("value","qq");
         QQoption.put("label","鹅厂(不要太过频繁否则无法下载)");
-        HashMap<String, String> QQVIPoption = new HashMap<>();
-        QQVIPoption.put("value","qqvip");
-        QQVIPoption.put("label","鹅厂VIP下载（请自行配置接口否则无法使用）");
         HashMap<String, String> MGoption = new HashMap<>();
         MGoption.put("value","mg");
         MGoption.put("label","10086(有问题暂停使用)");
@@ -108,9 +144,14 @@ public class SetController {
         neteaseoption.put("label","猪厂");
         hashMaps.add(kwoption);
         hashMaps.add(QQoption);
-        hashMaps.add(QQVIPoption);
         hashMaps.add(MGoption);
         hashMaps.add(neteaseoption);
+        if (qqopenconfigKey!=null&&Boolean.getBoolean(qqopenconfigKey.getConfigValue())){
+            HashMap<String, String> QQVIPoption = new HashMap<>();
+            QQVIPoption.put("value","qqvip");
+            QQVIPoption.put("label","鹅厂VIP下载（请自行配置接口否则无法使用）");
+            hashMaps.add(QQVIPoption);
+        }
         return AjaxResult.success(hashMaps);
     }
     @GetMapping("version")

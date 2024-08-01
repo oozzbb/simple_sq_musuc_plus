@@ -186,7 +186,7 @@ public class QQSearchEntity {
                            "AlbumSongList": {
                                "module": "music.musichallAlbum.AlbumSongList",
                                "method": "GetAlbumSongList",
-                               "param": {"albumMid": "%s", "begin": 0, "num": 60, "order": 2}
+                               "param": {"albumMid": "%s", "begin": 0, "num": 100, "order": 2}
                            },
                            "comm": {
                                "g_tk": 0,
@@ -334,14 +334,19 @@ public class QQSearchEntity {
         String albumImageconfig = qqConfig.getAlbumImage();
         String albumImage = albumImageconfig.replaceAll("#\\{pmid}", albumpmid);
         String artistId = mapper1.getArray("singer").getMapper(0).getString("mid");
-        String artistname = mapper1.getArray("singer").getMapper(0).getString("name");
-
+        Array singer = mapper1.getArray("singer");
+//        String artistname = mapper1.getArray("singer").getMapper(0).getString("name");
+        ArrayList<String> strings = new ArrayList<>();
+        singer.forEach((i,e)->{
+            String string = e.toMapper().getString("name");
+            strings.add(string);
+        });
         String lyricResult = toPlugLyricResult(mid,qqConfig);
         Music music = new Music().setId(mid)
                 .setMusicImage(albumImage)
                 .setMusicLyric(lyricResult)
                 .setMusicAlbum(albumname)
-                .setMusicArtists(artistname)
+                .setMusicArtists(StringUtils.join(strings,"&"))
                 .setMusicName(name).
                 setOther(JSONObject.parseObject(mapper1.toString()))
                 .setAlbumId(albumid)

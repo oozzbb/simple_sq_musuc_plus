@@ -4,6 +4,7 @@ import com.ejlchina.okhttps.Process;
 import com.ejlchina.okhttps.*;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import okhttp3.logging.HttpLoggingInterceptor;
 import org.jsoup.Jsoup;
 
 import javax.net.ssl.*;
@@ -58,7 +59,7 @@ public class DownloadUtils {
                 builder.readTimeout(7, TimeUnit.DAYS);
                 //连接池
                 builder.connectionPool(new ConnectionPool(10, 5, TimeUnit.MINUTES));
-                //添加重试
+//                //添加重试
 //                builder.addInterceptor(chain -> {
 //                    HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
 //                    logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
@@ -230,6 +231,12 @@ public class DownloadUtils {
         return result;
     }
 
+    public static  OkHttpClient getOkHttpClient() {
+        if(okHttpClient==null){
+            okHttpClient = new OkHttpClient();
+        }
+        return okHttpClient;
+    }
 
 
 

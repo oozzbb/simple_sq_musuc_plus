@@ -43,31 +43,35 @@ public class SubsonicHander {
      * @return
      */
     public Boolean checkLoginInfo() {
-        SqConfig url = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.subsonic.url"));
-        SqConfig usernmae = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.subsonic.usernmae"));
-        SqConfig password = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.subsonic.password"));
-        if (url != null && StringUtils.isEmpty(url.getConfigValue())) {
-            return false;
-        }
-        if (usernmae != null && StringUtils.isEmpty(usernmae.getConfigValue())) {
-            return false;
-        }
-        if (password != null && StringUtils.isEmpty(password.getConfigValue())) {
-            return false;
-        }
-        HTTP http = DownloadUtils.getHttp();
-        HttpResult httpResult = http.sync(url.getConfigValue() + subsonicConfig.getRestPing())
-                .addUrlPara("u", usernmae.getConfigValue())
-                .addUrlPara("p", password.getConfigValue())
-                .addUrlPara("v", "1.16.1")
-                .addUrlPara("c", "SqMusicPlus")
-                .addUrlPara("f", "json")
-                .get();
-        if (httpResult.getStatus() == 200) {
-            String status = httpResult.getBody().toMapper().getMapper("subsonic-response").getString("status");
-            if (status.equalsIgnoreCase("ok")) {
-                return true;
+        try {
+            SqConfig url = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.subsonic.url"));
+            SqConfig usernmae = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.subsonic.usernmae"));
+            SqConfig password = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.subsonic.password"));
+            if (url != null && StringUtils.isEmpty(url.getConfigValue())) {
+                return false;
             }
+            if (usernmae != null && StringUtils.isEmpty(usernmae.getConfigValue())) {
+                return false;
+            }
+            if (password != null && StringUtils.isEmpty(password.getConfigValue())) {
+                return false;
+            }
+            HTTP http = DownloadUtils.getHttp();
+            HttpResult httpResult = http.sync(url.getConfigValue() + subsonicConfig.getRestPing())
+                    .addUrlPara("u", usernmae.getConfigValue())
+                    .addUrlPara("p", password.getConfigValue())
+                    .addUrlPara("v", "1.16.1")
+                    .addUrlPara("c", "SqMusicPlus")
+                    .addUrlPara("f", "json")
+                    .get();
+            if (httpResult.getStatus() == 200) {
+                String status = httpResult.getBody().toMapper().getMapper("subsonic-response").getString("status");
+                if (status.equalsIgnoreCase("ok")) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            return false;
         }
         return false;
     }
