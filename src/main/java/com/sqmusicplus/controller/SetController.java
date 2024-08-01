@@ -70,19 +70,34 @@ public class SetController {
             }
 
             SqConfig qqconfig = configService.getOne(new QueryWrapper<SqConfig>().eq(SqConfig.COL_CONFIG_KEY, "plug.qqvip.qq"));
-            FreeCookieUtil.refreshCookies(qqconfig.getConfigValue(), config.getConfigValue());
+            try {
+                FreeCookieUtil.refreshCookies(qqconfig.getConfigValue(), config.getConfigValue());
+            } catch (Exception e) {
+                configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.qqvip.open").set("config_key", "false"));
+                log.error("获取QQvip失败请检查ip和qq是否准确已自动关闭该插件");
+            }
 
         }
         if (config.getConfigKey().equals("plug.qqvip.qq")) {
             SqConfig urlconfig = configService.getOne(new QueryWrapper<SqConfig>().eq(SqConfig.COL_CONFIG_KEY, "plug.qqvip.baseurl"));
-            FreeCookieUtil.refreshCookies(config.getConfigValue(), urlconfig.getConfigValue());
+            try {
+                FreeCookieUtil.refreshCookies(config.getConfigValue(), urlconfig.getConfigValue());
+            } catch (Exception e) {
+                configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.qqvip.open").set("config_key", "false"));
+                log.error("获取QQvip失败请检查ip和qq是否准确已自动关闭该插件");
+            }
         }
 
 
         if (config.getConfigKey().equals("plug.qqvip.open")) {
             SqConfig urlconfig = configService.getOne(new QueryWrapper<SqConfig>().eq(SqConfig.COL_CONFIG_KEY, "plug.qqvip.baseurl"));
             SqConfig qqconfig = configService.getOne(new QueryWrapper<SqConfig>().eq(SqConfig.COL_CONFIG_KEY, "plug.qqvip.qq"));
-            FreeCookieUtil.refreshCookies(qqconfig.getConfigValue(), urlconfig.getConfigValue());
+            try {
+                FreeCookieUtil.refreshCookies(qqconfig.getConfigValue(), urlconfig.getConfigValue());
+            } catch (Exception e) {
+                configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.qqvip.open").set("config_key", "false"));
+                log.error("获取QQvip失败请检查ip和qq是否准确已自动关闭该插件");
+            }
         }
 
         boolean b = false;

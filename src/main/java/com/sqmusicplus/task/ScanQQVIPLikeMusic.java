@@ -42,7 +42,6 @@ public class ScanQQVIPLikeMusic {
     @Autowired
     private SqConfigService configService;
 
-
     @Autowired
     private QQvipHander qqvipHander;
 
@@ -177,7 +176,6 @@ public class ScanQQVIPLikeMusic {
             Mapper collectdata = collectmapper.getMapper("data");
             Array list = collectdata.getArray("list");
             list.forEach((index, item) -> {
-
                     String diss_name = item.toMapper().getString("dissname");
                     if (!excludeNames.contains(diss_name)){
                         log.info("同步我收藏的的歌单{}的歌曲共找到{}首",diss_name,item.toMapper().getLong("songnum"));
