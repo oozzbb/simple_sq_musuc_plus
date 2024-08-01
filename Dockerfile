@@ -7,7 +7,7 @@ COPY pom.xml /build/
 COPY src /build/src/
 COPY src/main/resources/sqlite/sqmusic.db /cache/sqmusic.db
 
-COPY config /cache/
+COPY chache /cache/
 
 RUN mvn clean package
 
