@@ -15,17 +15,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "qqvip")
 public class QQVipConfig extends PlugConfig {
 
-    //接口地址
-    private String baseUrl;
-    //会员的cookie 最好是QQ的能自动刷新
-    private String baseCookie;
 
-
-
-
+    
 
 
     @Override

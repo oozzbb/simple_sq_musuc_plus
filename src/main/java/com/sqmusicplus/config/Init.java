@@ -60,7 +60,7 @@ public class Init implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         SqConfig init_download = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.init.download"));
         SqConfig subsonic = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.subsonic.start"));
-        if (Boolean.parseBoolean(subsonic.getConfigValue())) {
+        if (subsonic!=null&&Boolean.parseBoolean(subsonic.getConfigValue())) {
             Boolean aBoolean = subsonicHander.checkLoginInfo();
             if (aBoolean) {
                 log.info("subsonic服务连接正常");
@@ -80,8 +80,6 @@ public class Init implements ApplicationRunner {
         neteaseHander.initPlug();
         qqvipHander.initPlug();
         log.info("当前服务版本->{}", version);
-
-
             SqConfig qqopenconfigKey = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.open"));
                 if (qqopenconfigKey==null){
                     SqConfig sqConfig = new SqConfig();

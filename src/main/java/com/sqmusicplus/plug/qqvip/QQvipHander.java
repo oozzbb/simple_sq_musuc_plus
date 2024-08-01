@@ -147,11 +147,9 @@ public class QQvipHander extends SearchHanderAbstract {
             jsonObject.put("id", musicId);
         }
         jsonObject.put("type", type);
-        String baseUrl = qqvipConfig.getBaseUrl();
         SqConfig configKey = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.baseurl"));
-        if (configKey!=null){
-            baseUrl =  configKey.getConfigValue();
-        }
+            String baseUrl =  configKey.getConfigValue();
+
         String url = HttpUtil.urlWithForm(baseUrl + "/song/url", jsonObject, Charset.forName("UTF-8"), true);
         OkHttpClient client = DownloadUtils.getOkHttpClient();
         try {
