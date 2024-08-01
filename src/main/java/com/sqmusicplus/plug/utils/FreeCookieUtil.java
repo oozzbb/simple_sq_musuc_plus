@@ -51,8 +51,7 @@ private static   ArrayList<String> Cookies = new ArrayList<String>();
         HttpResult httpResult = http.sync(baseUrl + "/user/getCookie?id=" + qq).get();
         Mapper mapper = httpResult.getBody().toMapper();
         mapper.forEach((s, dataSet) -> {
-            log.info("qqapi返回值：key->{}", s);
-            log.info("qqapi返回值：value->{}", dataSet.toString());
+            log.info("qqapi返回值：{}->{}", s,dataSet.toString());
         });
         ArrayList<String> cookies =  new ArrayList<String>();
 
