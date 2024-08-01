@@ -7,6 +7,8 @@ COPY pom.xml /build/
 COPY src /build/src/
 COPY src/main/resources/sqlite/sqmusic.db /cache/sqmusic.db
 
+COPY config /cache/
+
 RUN mvn clean package
 
 From mcr.microsoft.com/openjdk/jdk:17-ubuntu
@@ -21,5 +23,5 @@ VOLUME ["/music"]
 
 VOLUME ["/cache"]
 
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "-jar"," --spring.config.location=/cache/", "app.jar"]
 
