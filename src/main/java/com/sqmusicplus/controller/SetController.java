@@ -89,7 +89,7 @@ public class SetController {
         }
 
 
-        if (config.getConfigKey().equals("plug.qqvip.open")) {
+        if (config.getConfigKey().equals("plug.qqvip.open")&&config.getConfigValue().equals("true")) {
             SqConfig urlconfig = configService.getOne(new QueryWrapper<SqConfig>().eq(SqConfig.COL_CONFIG_KEY, "plug.qqvip.baseurl"));
             SqConfig qqconfig = configService.getOne(new QueryWrapper<SqConfig>().eq(SqConfig.COL_CONFIG_KEY, "plug.qqvip.qq"));
             try {
