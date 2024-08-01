@@ -54,12 +54,6 @@ public class Init implements ApplicationRunner {
     @Autowired
     private NeteaseHander neteaseHander;
 
-    @Value("${qqvip.baseUrl:null}")
-    private String qqVipBaseUrl;
-    @Value("${qqvip.qq:null}")
-    private String qq;
-    @Value("${qqvip.open:false}")
-    private Boolean qqvipopen;
 
 
     @Override
@@ -88,12 +82,11 @@ public class Init implements ApplicationRunner {
         log.info("当前服务版本->{}", version);
 
 
-        if (qqvipopen.booleanValue()){
             SqConfig qqopenconfigKey = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.open"));
                 if (qqopenconfigKey==null){
                     SqConfig sqConfig = new SqConfig();
                     sqConfig.setConfigKey("plug.qqvip.open");
-                    sqConfig.setConfigValue(qqvipopen.toString());
+                    sqConfig.setConfigValue("false");
                     sqConfig.setConfigName("QQvip插件是否启用开关");
                     sqConfig.setType("switch");
                     configService.save(sqConfig);
@@ -130,57 +123,35 @@ public class Init implements ApplicationRunner {
 
 
 
-                }else{
-                    if (!qqopenconfigKey.getConfigValue().equals(qqvipopen.toString())){
-                        log.info("发现qqvip开关与数据库不同更新为 开关：{}",qqvipopen.toString());
-                        configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.qqvip.open").set("config_value", qqvipopen.toString()));
-                    }
                 }
-
-            if(StringUtils.isNotBlank(qqVipBaseUrl)&& !qqVipBaseUrl.equals("null")){
-                qqVipBaseUrl = qqVipBaseUrl.replaceAll("/$", "");
                 SqConfig configKey = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.baseurl"));
-
                 if (configKey==null){
                     SqConfig sqConfig = new SqConfig();
                     sqConfig.setConfigKey("plug.qqvip.baseurl");
-                    sqConfig.setConfigValue(qqVipBaseUrl);
+                    sqConfig.setConfigValue("http://127.0.0.1");
                     sqConfig.setConfigName("QQvip基础url");
                     sqConfig.setType("input");
                     configService.save(sqConfig);
-                    log.info("新增QQvip基础url：{}", qqVipBaseUrl);
-                }else{
-                    if (!configKey.getConfigValue().equals(qqVipBaseUrl)){
-                        log.info("发现qqvip基础地址与数据库不同更新为 配置地址->{}",qqVipBaseUrl);
-                        configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.qqvip.baseurl").set("config_value", qqVipBaseUrl));
-                    }
+                    log.info("新增QQvip基础url：{}", sqConfig.getConfigValue());
                 }
-            }
-            if ( StringUtils.isNotBlank(qq)&& !qq.equals("null")){
                 SqConfig qqconfigKey = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.qq"));
                 if (qqconfigKey==null){
                     SqConfig qqsqConfig = new SqConfig();
                     qqsqConfig.setConfigKey("plug.qqvip.qq");
-                    qqsqConfig.setConfigValue(qq);
+                    qqsqConfig.setConfigValue("123456");
                     qqsqConfig.setConfigName("QQ号");
                     qqsqConfig.setType("input");
                     configService.save(qqsqConfig);
-                    log.info("新增QQ号：{}", qq);
-                }else{
-                    if (!qqconfigKey.getConfigValue().equals(qq)) {
-                        log.info("发现qqvip基础QQ与数据库不同更新为 QQ号：{}", qq);
-                        configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.qqvip.qq").set("config_value", qq));
-                    }
+                    log.info("新增QQ号：{}", qqsqConfig.getConfigValue());
                 }
-            }
 
 
-            if (StringUtils.isNotBlank(qq)&& !qq.equals("null")&& StringUtils.isNotBlank(qqVipBaseUrl)&& !qqVipBaseUrl.equals("null")){
-                FreeCookieUtil.refreshCookies(qq, qqVipBaseUrl);
-            }
-
+        if (qqconfigKey != null && configKey != null && qqopenconfigKey != null && qqopenconfigKey.getConfigValue() != null && configKey.getConfigValue() != null && qqconfigKey.getConfigValue() != null) {
+            FreeCookieUtil.refreshCookies(qqconfigKey.getConfigValue(), configKey.getConfigValue());
         }
+
     }
+
 
 
 }

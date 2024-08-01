@@ -2,7 +2,6 @@
 ## 更新
 1. 增加QQvip自动同步 我喜欢的歌单收藏专辑等功能需要启动后再设置中开启
 2. 增加自动同步配置参数需要修改文件 （设置中进行开启）
-[application-qqvip.yaml](config%2Fapplication-qqvip.yaml)
 
 
 
