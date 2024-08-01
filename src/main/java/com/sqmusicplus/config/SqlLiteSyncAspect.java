@@ -34,7 +34,7 @@ public class SqlLiteSyncAspect {
         String name = pjp.getSignature().getName();
 
         log.debug("方法环绕proceed，class - {}, 方法是 - {}", pjp.getTarget().getClass().getName(), name);
-        if (name.contains("save") ||name.contains("add") || name.contains("del") || name.contains("update")) {
+        if (name.contains("save") || name.contains("remove") ||name.contains("add") || name.contains("del") || name.contains("update")) {
             readWriteLock.writeLock().lock();
             try {
                 Object proceed = pjp.proceed();
