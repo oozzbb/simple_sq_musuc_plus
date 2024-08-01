@@ -58,7 +58,7 @@ public class NeteaseHander extends SearchHanderAbstract {
         MusicEnum.setBASE_URL_163Music(neteaseConfig.getBaseUrl());
         if (neteaseConfig.getAnonymousLogin()){
             HTTP http = DownloadUtils.getHttp();
-            Mapper mapper = http.sync(neteaseConfig.getCookieUrl()).get().getBody().toMapper();
+            Mapper mapper = http.sync(neteaseConfig.getCookieUrl()).addHeader("Accept", "application/xml;version=1").get().getBody().toMapper();
             if(mapper.getInt("code")==200){
                 neteaseCloudMusicInfo.setCookieString(neteaseConfig.getCookie());
                 log.info("netease匿名登录成功");

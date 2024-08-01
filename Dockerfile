@@ -23,5 +23,5 @@ VOLUME ["/music"]
 
 VOLUME ["/cache"]
 
-CMD ["java", "-jar"," --spring.config.location=/cache/", "app.jar"]
+CMD ["java", "-jar", "app.jar","--spring.config.location=/cache/"]
 

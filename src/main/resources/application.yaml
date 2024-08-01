@@ -58,4 +58,4 @@ sa-token:
   # 是否输出操作日志
   is-log: false
 
-version: 2.12.1
+version: 2.12.2

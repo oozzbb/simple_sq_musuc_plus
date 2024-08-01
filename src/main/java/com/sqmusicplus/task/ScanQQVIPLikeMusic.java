@@ -85,7 +85,7 @@ public class ScanQQVIPLikeMusic {
 
     public void syncalbu(String qq,String url){
         HTTP http = DownloadUtils.getHttp();
-        Mapper mapper = http.sync(url + "/user/collect/album?id=" + qq+"&pageSize=100").addHeader("Cookie", FreeCookieUtil.getCookieStr()).get().getBody().toMapper();
+        Mapper mapper = http.sync(url + "/user/collect/album?id=" + qq+"&pageSize=100").addHeader("Cookie", FreeCookieUtil.getCookieStr()).addHeader("Accept", "application/xml;version=1").get().getBody().toMapper();
         int result = mapper.getInt("result");
         if (result == 100){
             Mapper data = mapper.getMapper("data");

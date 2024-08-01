@@ -2,6 +2,7 @@ package com.sqmusicplus.utils;
 
 import com.ejlchina.okhttps.Process;
 import com.ejlchina.okhttps.*;
+import com.sqmusicplus.config.GlobalStatic;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -51,34 +52,36 @@ public class DownloadUtils {
             HTTP.Builder hb = HTTP.builder().config((OkHttpClient.Builder builder) -> {
                 builder.sslSocketFactory(mySSLSocketFactory, myTrustManager);
                 builder.hostnameVerifier(myHostnameVerifier);
+
+
                 // 连接超时时间（默认10秒）
-                builder.connectTimeout(7, TimeUnit.DAYS);
+                builder.connectTimeout(3, TimeUnit.MINUTES);
                 // 写入超时时间（默认10秒）
-                builder.writeTimeout(7, TimeUnit.DAYS);
+                builder.writeTimeout(3, TimeUnit.MINUTES);
                 // 读取超时时间（默认10秒）
-                builder.readTimeout(7, TimeUnit.DAYS);
+                builder.readTimeout(3, TimeUnit.MINUTES);
                 //连接池
                 builder.connectionPool(new ConnectionPool(10, 5, TimeUnit.MINUTES));
 //                //添加重试
-//                builder.addInterceptor(chain -> {
-//                    HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-//                    logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
-//                    // 添加日志拦截器
-//                    builder.addInterceptor(logging);
-//
-//                    int retryTimes = 0;
-//                    while (true) {
-//                        try {
-//                            return chain.proceed(chain.request());
-//                        } catch (Exception e) {
-//                            if (retryTimes >= 3) {
-//                                throw e;
-//                            }
-//                            log.debug("超时重试第{}次！",retryTimes);
-//                            retryTimes++;
-//                        }
-//                    }
-//                });
+                builder.addInterceptor(chain -> {
+                    HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+                    logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
+                    // 添加日志拦截器
+                    builder.addInterceptor(logging);
+
+                    int retryTimes = 0;
+                    while (true) {
+                        try {
+                            return chain.proceed(chain.request());
+                        } catch (Exception e) {
+                            if (retryTimes >= GlobalStatic.SUBSONIC_SYNC_MAXIMUM_STATISTICS) {
+                                throw e;
+                            }
+                            log.debug("超时重试第{}次！",retryTimes);
+                            retryTimes++;
+                        }
+                    }
+                });
 
             });
             ConvertProvider.inject(hb);
@@ -130,7 +133,10 @@ public class DownloadUtils {
             HTTP http = getHttp();
         SHttpTask sync = http.sync(url);
         if (headers!=null){
+            headers.put("Accept", "application/xml;version=1");
             sync.addHeader(headers);
+        }else{
+            sync.addHeader("Accept", "application/xml;version=1");
         }
         HttpResult.Body body = sync
                     .get()
