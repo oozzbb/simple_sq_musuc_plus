@@ -9,6 +9,7 @@ import com.sqmusicplus.base.entity.DownloadInfo;
 import com.sqmusicplus.base.service.DownloadInfoService;
 import com.sqmusicplus.config.AjaxResult;
 import com.sqmusicplus.download.DownloadStatus;
+import com.sqmusicplus.task.ScanQQVIPLikeMusic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +25,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/downloadInfo")
 public class DownloadInfoController {
 
+    @Autowired
+    private ScanQQVIPLikeMusic scanQQVIPLikeMusic;
+
 
     @Autowired
-    DownloadInfoService downloadInfoService;
+    private DownloadInfoService downloadInfoService;
 
     @GetMapping("/getDownloadInfo/{type}/{pageSize}/{pageIndex}")
     public AjaxResult getDownloadInfo(@PathVariable("type") String type, @PathVariable("pageSize") Integer pageSize, @PathVariable("pageIndex") Integer pageIndex){
@@ -96,4 +100,15 @@ public class DownloadInfoController {
            return AjaxResult.success();
     }
 
+
+    /**
+     * 刷新QQvip下载配置遵循数据库配置
+     * @return
+     */
+    @SaCheckLogin
+    @GetMapping("/refreshQQvipTask")
+    public AjaxResult refreshQQvipTask(){
+        scanQQVIPLikeMusic.excute();
+        return AjaxResult.success();
+    }
 }

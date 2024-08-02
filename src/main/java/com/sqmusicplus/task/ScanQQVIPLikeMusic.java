@@ -82,7 +82,7 @@ public class ScanQQVIPLikeMusic {
 
 
 
-    public void syncalbu(String qq,String url){
+    private void syncalbu(String qq,String url){
         HTTP http = DownloadUtils.getHttp();
         Mapper mapper = http.sync(url + "/user/collect/album?id=" + qq+"&pageSize=100").addHeader("Cookie", FreeCookieUtil.getCookieStr()).addHeader("Accept", "application/xml;version=1").get().getBody().toMapper();
         int result = mapper.getInt("result");
@@ -132,7 +132,7 @@ public class ScanQQVIPLikeMusic {
 
     }
 
-    public void syncplaylist(String qq , String url){
+    private void syncplaylist(String qq , String url){
         ArrayList<String> excludeNames = new ArrayList<>();
         //不同步的歌单名称
         SqConfig syncplaylistexclude = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.syncplaylistexclude"));
@@ -204,7 +204,7 @@ public class ScanQQVIPLikeMusic {
      * @param qq
      * @param url
      */
-    public void syncLikeSong(String qq , String url){
+    private void syncLikeSong(String qq , String url){
         HTTP http = DownloadUtils.getHttp();
         Mapper mapper = http.sync(url + "/user/songlist?id=" + qq).addHeader("Cookie", FreeCookieUtil.getCookieStr()).get().getBody().toMapper();
         int result = mapper.getInt("result");
@@ -230,7 +230,7 @@ public class ScanQQVIPLikeMusic {
      * @param url
      * @param tid
      */
-    public void syncsonglist(String url,String tid){
+    private void syncsonglist(String url,String tid){
         HTTP http = DownloadUtils.getHttp();
         Mapper mapper = http.sync(url + "/songlist?id=" + tid).addHeader("Cookie", FreeCookieUtil.getCookieStr()).get().getBody().toMapper();
         int result = mapper.getInt("result");
