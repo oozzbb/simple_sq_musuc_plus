@@ -54,6 +54,10 @@ public class DownloadExcute {
 
     public void getDownloadInfo() {
 
+        SqConfig subsonic_start = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.subsonic.start"));
+
+
+
         LambdaQueryWrapper<DownloadInfo> objectLambdaQueryWrapper = new LambdaQueryWrapper<>();
         objectLambdaQueryWrapper.eq(DownloadInfo::getStatus, DownloadStatus.waiting.value);
         long waitsize = downloadInfoService.count(objectLambdaQueryWrapper);
@@ -90,7 +94,9 @@ public class DownloadExcute {
                             ReflectUtil.invoke(bean, "dnonloadAndSaveToFile", downloadEntity, bean);
                         }
                         try {
-                            addSubsonicPlayList(downloadEntity);
+                            if (Boolean.parseBoolean(subsonic_start.getConfigValue())) {
+                                addSubsonicPlayList(downloadEntity);
+                            }
                         } catch (Exception e) {
                             log.info("添加到Subsonic中失败----》{}",record);
                         }
@@ -116,15 +122,12 @@ public class DownloadExcute {
 
     public DownloadEntity addSubsonicPlayList(DownloadEntity downloadEntity) {
         String addSubsonicPlayListName = downloadEntity.getAddSubsonicPlayListName();
-        SqConfigService configService = SpringContextUtil.getBean(SqConfigService.class);
-        SqConfig subsonic_start = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.subsonic.start"));
-        if (Boolean.getBoolean(subsonic_start.getConfigValue())) {
             if (StringUtils.isNotEmpty(addSubsonicPlayListName)) {
                 log.debug("需要添加到第三方中--->{}",downloadEntity);
                 SyncTask syncTask = SpringContextUtil.getBean(SyncTask.class);
                 syncTask.excute(downloadEntity);
             }
-        }
+
         return downloadEntity;
     }
 

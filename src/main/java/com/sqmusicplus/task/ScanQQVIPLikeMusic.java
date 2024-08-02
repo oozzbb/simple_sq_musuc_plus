@@ -286,8 +286,10 @@ public class ScanQQVIPLikeMusic {
                         brType = PlugBrType.QQVIP_MP3_128;
                     }
                     Music music = qqvipHander.querySongById(songmid);
+
                     DownloadEntity downloadEntity = qqvipHander.downloadSong(music, brType, null);
                     DownloadInfo downloadInfo = MusicUtils.downloadEntitytoDownloadInfoTo(downloadEntity);
+
                     downloadInfos.add(downloadInfo);
                 }
             });

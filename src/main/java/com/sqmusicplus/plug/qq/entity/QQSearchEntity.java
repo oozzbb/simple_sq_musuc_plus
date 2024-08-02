@@ -335,7 +335,6 @@ public class QQSearchEntity {
         String albumImage = albumImageconfig.replaceAll("#\\{pmid}", albumpmid);
         String artistId = mapper1.getArray("singer").getMapper(0).getString("mid");
         Array singer = mapper1.getArray("singer");
-//        String artistname = mapper1.getArray("singer").getMapper(0).getString("name");
         ArrayList<String> strings = new ArrayList<>();
         singer.forEach((i,e)->{
             String string = e.toMapper().getString("name");

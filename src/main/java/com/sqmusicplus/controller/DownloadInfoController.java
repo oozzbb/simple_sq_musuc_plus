@@ -42,7 +42,7 @@ public class DownloadInfoController {
     @GetMapping("/delAllTask")
     public AjaxResult delAllTask(){
         QueryWrapper<DownloadInfo> downloadInfoQueryWrapper = new QueryWrapper<>();
-        downloadInfoQueryWrapper.eq("1",1);
+        downloadInfoQueryWrapper.eq(DownloadStatus.error.getValue(),1);
         downloadInfoService.remove(downloadInfoQueryWrapper);
         return AjaxResult.success();
     }

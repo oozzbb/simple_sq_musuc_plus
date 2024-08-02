@@ -42,6 +42,9 @@ public abstract class SearchHanderAbstract implements SearchHander, Serializable
         try {
             //获取歌曲详情
             Music music = searchHander.querySongById(downloadEntity.getMusicid());
+            if (music == null) {
+                throw new RuntimeException("下载失败歌曲信息不完整:" +JSONObject.toJSONString(downloadEntity) );
+            }
             String musicPath = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.download.path")).getConfigValue();
             File file = new File(musicPath);
             //使用传递的名称
@@ -71,6 +74,7 @@ public abstract class SearchHanderAbstract implements SearchHander, Serializable
             if (Boolean.valueOf(configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.override.download")).getConfigValue())) {
                 if (type.exists()) {
                    log.info("歌曲{}---->已存在不下载",music.getMusicName().trim());
+                   return;
                 }
             }
             if (StringUtils.isEmpty(stringStringHashMap.get("url"))) {

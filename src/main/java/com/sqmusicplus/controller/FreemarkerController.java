@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @Classname FreemarkerController
- * @Description TODO
+ * @Description 页面控制
  * @Version 1.0.0
  * @Date 2023/9/21 18:29
- * @Created by Administrator
+ * @Created by SQ
  */
 @Slf4j
 @Controller
@@ -19,7 +19,7 @@ public class FreemarkerController {
 
     @RequestMapping(value = {"/","/index"})
     public String  search(){
-        return "redirect:/index.html";
+        return "redirect:/";
     }
 //    @RequestMapping(value = {"/login"})
 //    public String  login(){
