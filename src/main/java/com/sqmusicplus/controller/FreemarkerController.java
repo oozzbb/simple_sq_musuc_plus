@@ -19,7 +19,7 @@ public class FreemarkerController {
 
     @RequestMapping(value = {"/","/index"})
     public String  search(){
-        return "redirect:/";
+        return "redirect:/index.html#/login";
     }
 //    @RequestMapping(value = {"/login"})
 //    public String  login(){

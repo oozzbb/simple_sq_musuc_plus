@@ -54,8 +54,19 @@ public class ScanQQVIPLikeMusic {
         SqConfig syncConfig = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.sync"));
 
         if (qqopenconfigKey!=null&&Boolean.parseBoolean(qqopenconfigKey.getConfigValue())&&Boolean.parseBoolean(syncConfig.getConfigValue())){
+
+
             SqConfig urlconfig = configService.getOne(new QueryWrapper<SqConfig>().eq(SqConfig.COL_CONFIG_KEY, "plug.qqvip.baseurl"));
             SqConfig qqconfig = configService.getOne(new QueryWrapper<SqConfig>().eq(SqConfig.COL_CONFIG_KEY, "plug.qqvip.qq"));
+
+            try {
+                FreeCookieUtil.refreshCookies(qqconfig.getConfigValue(), urlconfig.getConfigValue());
+            } catch (Exception e) {
+                configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.qqvip.open").set("config_key", "false"));
+                log.error("获取QQvip失败请检查ip和qq是否准确已自动关闭该插件");
+            }
+
+
             //喜欢单曲
             SqConfig syncLikeSongConfig = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.synclikesong"));
             if (Boolean.parseBoolean(syncLikeSongConfig.getConfigValue())){
@@ -211,6 +222,7 @@ public class ScanQQVIPLikeMusic {
         if (result == 100){
             Mapper data = mapper.getMapper("data");
             Array list = data.getArray("list");
+
             list.forEach((index, item) -> {
                 int dirid = item.toMapper().getInt("dirid");
                 if(dirid == 201){
