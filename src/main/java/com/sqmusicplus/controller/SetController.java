@@ -144,6 +144,12 @@ public class SetController {
         SqConfig qqopenconfigKey = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.open"));
 
         ArrayList<HashMap<String, String>> hashMaps = new ArrayList<>();
+        if (qqopenconfigKey!=null&&Boolean.parseBoolean(qqopenconfigKey.getConfigValue())){
+            HashMap<String, String> QQVIPoption = new HashMap<>();
+            QQVIPoption.put("value","qqvip");
+            QQVIPoption.put("label","鹅厂VIP下载（自动同步喜欢的去设置开启）");
+            hashMaps.add(QQVIPoption);
+        }
         HashMap<String, String> kwoption = new HashMap<>();
         kwoption.put("value","kw");
         kwoption.put("label","某我");
@@ -161,12 +167,7 @@ public class SetController {
         hashMaps.add(QQoption);
         hashMaps.add(MGoption);
         hashMaps.add(neteaseoption);
-        if (qqopenconfigKey!=null&&Boolean.parseBoolean(qqopenconfigKey.getConfigValue())){
-            HashMap<String, String> QQVIPoption = new HashMap<>();
-            QQVIPoption.put("value","qqvip");
-            QQVIPoption.put("label","鹅厂VIP下载（自动同步喜欢的去设置开启）");
-            hashMaps.add(QQVIPoption);
-        }
+
         return AjaxResult.success(hashMaps);
     }
     @GetMapping("version")
