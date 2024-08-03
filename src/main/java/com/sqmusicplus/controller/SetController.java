@@ -164,7 +164,7 @@ public class SetController {
         if (qqopenconfigKey!=null&&Boolean.parseBoolean(qqopenconfigKey.getConfigValue())){
             HashMap<String, String> QQVIPoption = new HashMap<>();
             QQVIPoption.put("value","qqvip");
-            QQVIPoption.put("label","鹅厂VIP下载（请自行配置接口否则无法使用）");
+            QQVIPoption.put("label","鹅厂VIP下载（自动同步喜欢的去设置开启）");
             hashMaps.add(QQVIPoption);
         }
         return AjaxResult.success(hashMaps);
