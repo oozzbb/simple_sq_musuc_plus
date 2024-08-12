@@ -56,9 +56,8 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: java-artifact
+      - name: Display structure of downloaded files
         run: ls -R
-
-
       - name: Read Version from Artifact
         id: app_version
         run: |
