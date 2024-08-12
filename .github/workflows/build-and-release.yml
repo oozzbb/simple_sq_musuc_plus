@@ -16,6 +16,8 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'maven'
+          cache-dependency-path: 'pom.xml' # optional
       - name: Install yq
         run: |
           wget https://github.com/mikefarah/yq/releases/download/v4.16.2/yq_linux_amd64 -O /usr/local/bin/yq
@@ -40,7 +42,7 @@ jobs:
       - name: Read Application Version
         id: app_version
         run: |
-          VERSION=$(yq e '.version' application.yml)
+          VERSION=$(yq e '.version' src/main/resources/application.yml)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       - name: Create Release
         id: create_release
