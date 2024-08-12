@@ -16,6 +16,10 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+      - name: Install yq
+        run: |
+          wget https://github.com/mikefarah/yq/releases/download/v4.16.2/yq_linux_amd64 -O /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
       - name: Build with Maven
         run: mvn -B package --file pom.xml
       - name: Upload Artifact
@@ -36,7 +40,6 @@ jobs:
       - name: Read Application Version
         id: app_version
         run: |
-          # 读取 application.yml 中的版本号
           VERSION=$(yq r application.yml version)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       - name: Create Release
