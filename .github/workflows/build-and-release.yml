@@ -22,8 +22,17 @@ jobs:
         run: |
           wget https://github.com/mikefarah/yq/releases/download/v4.16.2/yq_linux_amd64 -O /usr/local/bin/yq
           chmod +x /usr/local/bin/yq
+      - name: Read Application Version
+        id: app_version
+        run: |
+          VERSION=$(cd src/main/resources && yq e '.version' application.yml)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
       - name: Build with Maven
-        run: mvn -B package --file pom.xml
+        env:
+          APP_VERSION: ${{ steps.app_version.outputs.version }}
+        run: |
+          mvn -B package --file pom.xml \
+            -Dapp.version=${APP_VERSION}
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -39,19 +48,15 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: java-artifact
-      - name: Read Application Version
-        id: app_version
-        run: |        
-          VERSION=$(yq e '.version' /home/runner/work/simple_sq_musuc_plus/src/main/resources/application.yml)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_VERSION: ${{ steps.build.outputs.app_version }}
         with:
-          tag_name: ${{ steps.app_version.outputs.version }}
-          release_name: Release ${{ steps.app_version.outputs.version }}
+          tag_name: ${{ env.APP_VERSION }}
+          release_name: Release ${{ env.APP_VERSION }}
           draft: false
           prerelease: false
       - name: Upload Release Asset
