@@ -46,17 +46,20 @@ public class SqlLiteSyncAspect {
                 readWriteLock.writeLock().unlock();
             }
 
-        } else {
-            try {
-                readWriteLock.readLock().lock();
-                Object proceed = pjp.proceed();
-                return proceed;
-            } catch (Exception e) {
-                log.error("读锁保护代码发生异常", e);
-                throw e;
-            } finally {
-                readWriteLock.readLock().unlock();
-            }
+        }
+        else {
+            Object proceed = pjp.proceed();
+            return proceed;
+//            try {
+//                readWriteLock.readLock().lock();
+//                Object proceed = pjp.proceed();
+//                return proceed;
+//            } catch (Exception e) {
+//                log.error("读锁保护代码发生异常", e);
+//                throw e;
+//            } finally {
+//                readWriteLock.readLock().unlock();
+//            }
 
         }
 
