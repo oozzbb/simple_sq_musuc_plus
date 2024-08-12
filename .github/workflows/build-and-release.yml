@@ -41,8 +41,9 @@ jobs:
           name: java-artifact
       - name: Read Application Version
         id: app_version
+        working-directory: src/main/resources
         run: |
-          VERSION=$(yq e '.version' src/main/resources/application.yml)
+          VERSION=$(yq e '.version' application.yml)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       - name: Create Release
         id: create_release
