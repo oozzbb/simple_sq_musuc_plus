@@ -4,6 +4,9 @@ on:
   push:
     branches: [ 2.0 ] # 只在提交到2.0分支时触发
 
+env:
+  APP_VERSION: ""
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,7 +30,11 @@ jobs:
         run: |
           VERSION=$(cd src/main/resources && yq e '.version' application.yml)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "APP_VERSION: $VERSION"
           echo "Version: $VERSION" > version.txt
+      - name: List Environment Variables
+        run: env
       - name: Build with Maven
         run: |
           mvn -B package --file pom.xml
@@ -36,30 +43,34 @@ jobs:
         with:
           name: java-artifact
           path: |
-            target/*.jar # 假设你的输出文件是.jar格式
-            version.txt # 包含版本号的文件
+            target/*.jar 
+            version.txt
+            
 
   release:
-    needs: build # 确保 release 阶段在 build 阶段之后运行
+    needs: build
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/2.0' }}
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v3
         with:
-          name: java-artifact # 确保名称与上传时一致
+          name: java-artifact
+
       - name: Read Version from Artifact
         id: app_version
         run: |
-          VERSION=$(cat version.txt)
+          VERSION=$(cat ./java-artifact/version.txt)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "APP_VERSION: $VERSION"
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.app_version.outputs.version }} # 从 artifact 中读取版本号
+          tag_name: ${{ steps.app_version.outputs.version }} # 从 artifact 中读取版本号          release_name: Release ${{ env.APP_VERSION }}
           release_name: Release ${{ steps.app_version.outputs.version }}
           draft: false
           prerelease: false
