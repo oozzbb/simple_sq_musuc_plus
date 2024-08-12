@@ -119,8 +119,6 @@ public class Init implements ApplicationRunner {
                     syncplaylistexclude.setType("input");
                     configService.save(syncplaylistexclude);
 
-
-
                 }
                 SqConfig configKey = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.baseurl"));
                 if (configKey==null){
