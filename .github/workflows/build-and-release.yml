@@ -63,7 +63,6 @@ jobs:
           VERSION=$(cat version.txt)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "APP_VERSION: $VERSION"
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
