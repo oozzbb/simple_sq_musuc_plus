@@ -27,10 +27,13 @@ jobs:
           chmod +x /usr/local/bin/yq
       - name: Read Application Version
         id: app_version
-        run: |
+        run: |        
           VERSION=$(cd src/main/resources && yq e '.version' application.yml)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "APP_VERSION: $VERSION"
+      - name: List Environment Variables
+        run: env
       - name: Build with Maven
         run: |
           mvn -B package --file pom.xml
