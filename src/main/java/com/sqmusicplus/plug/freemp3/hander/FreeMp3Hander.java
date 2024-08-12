@@ -21,7 +21,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.xm.Similarity;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,87 +47,87 @@ public class FreeMp3Hander {
     @Autowired
     private SqConfigService configService;
 
-
-    /**
-     * 找出最有可能的专辑名称（可以用但是发现从页面上获取更方便以后做自动整理文件时候使用）
-     * @param musicName
-     * @param artists
-     * @return
-     */
-    public String getMusicAlbumByMusicNameAndArtistName (String musicName, List<String> artists){
-        //如果不匹配找出的最有可能的专辑名称
-        String similarityName  = "other";
-        //当前找出的相似度
-        Double similarityValue = 0.0;
-
-        for (SearchHanderAbstract searchHanderAbstract : searchHanderAbstractList) {
-            SearchKeyData searchKeyData = new SearchKeyData();
-            searchKeyData.setSearchkey(musicName+" "+ StringUtils.join(artists," "));
-            searchKeyData.setSearchType(searchHanderAbstract.getPlugName());
-            searchKeyData.setPageIndex(1);
-            searchKeyData.setPageSize(10);
-            PlugSearchResult<PlugSearchMusicResult> plugSearchMusicResultPlugSearchResult = searchHanderAbstract.querySongByName(searchKeyData);
-            if (plugSearchMusicResultPlugSearchResult!=null&&plugSearchMusicResultPlugSearchResult.getRecords().size()>0){
-                List<PlugSearchMusicResult> records = plugSearchMusicResultPlugSearchResult.getRecords();
-                for (PlugSearchMusicResult record : records) {
-                    String name = record.getName();
-                    String tempArtist = record.getArtistName();
-
-                    ArrayList<String> tempArtisList = new ArrayList<>();
-                    if (tempArtist.contains(",")){
-                        String[] split = tempArtist.split(",");
-                        for (String s : split) {
-                            tempArtisList.add(s);
-                        }
-                    }else if (tempArtist.contains("/")){
-                        String[] split = tempArtist.split("/");
-                        for (String s : split) {
-                            tempArtisList.add(s);
-                        }
-                    }else if (tempArtist.contains("&")){
-                        String[] split = tempArtist.split("&");
-                        for (String s : split) {
-                            tempArtisList.add(s);
-                        }
-                    }else{
-                        tempArtisList.add(tempArtist);
-                    }
-                   if (tempArtisList.size()==artists.size()&&tempArtisList.containsAll(artists)){
-                       //对比完歌手对比名称
-                       String regExp="[\n`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。， 、？]";
-                       musicName = musicName.replaceAll(regExp,"");
-                       name = name.replaceAll(regExp,"");
-                       if (name.equals(musicName)){
-                           //匹配
-                           return record.getAlbumName();
-                       }else{
-                           //歌手对上了但是名字没对应上计算相似度80%以上的记录下来最终没找到用这个
-                           //字面相似度
-                           double charBasedSimilarityResult = Similarity.charBasedSimilarity(musicName, name);
-                            //拼音相似度
-                           double pinyinSimilarityResult = Similarity.pinyinSimilarity(musicName, name);
-                           //概念相似度
-                           double conceptSimilarityResult = Similarity.conceptSimilarity(musicName, name);
-
-                           if (charBasedSimilarityResult==1.0||pinyinSimilarityResult==1.0||conceptSimilarityResult==1.0){
-                               //匹配
-                               return record.getAlbumName();
-                           }else if (charBasedSimilarityResult>0.7||pinyinSimilarityResult>0.7||conceptSimilarityResult>0.7){
-                               //部分匹配的上等马(找出最厉害的上等马)
-                               double max = NumberUtil.max(charBasedSimilarityResult, pinyinSimilarityResult, conceptSimilarityResult);
-                                if (similarityValue>max){
-                                    similarityName = record.getAlbumName() ;
-                                    similarityValue =max;
-                                }
-                           }
-                       }
-                   }
-
-                }
-            }
-        }
-        return similarityName;
-    }
+//
+//    /**
+//     * 找出最有可能的专辑名称（可以用但是发现从页面上获取更方便以后做自动整理文件时候使用）
+//     * @param musicName
+//     * @param artists
+//     * @return
+//     */
+//    public String getMusicAlbumByMusicNameAndArtistName (String musicName, List<String> artists){
+//        //如果不匹配找出的最有可能的专辑名称
+//        String similarityName  = "other";
+//        //当前找出的相似度
+//        Double similarityValue = 0.0;
+//
+//        for (SearchHanderAbstract searchHanderAbstract : searchHanderAbstractList) {
+//            SearchKeyData searchKeyData = new SearchKeyData();
+//            searchKeyData.setSearchkey(musicName+" "+ StringUtils.join(artists," "));
+//            searchKeyData.setSearchType(searchHanderAbstract.getPlugName());
+//            searchKeyData.setPageIndex(1);
+//            searchKeyData.setPageSize(10);
+//            PlugSearchResult<PlugSearchMusicResult> plugSearchMusicResultPlugSearchResult = searchHanderAbstract.querySongByName(searchKeyData);
+//            if (plugSearchMusicResultPlugSearchResult!=null&&plugSearchMusicResultPlugSearchResult.getRecords().size()>0){
+//                List<PlugSearchMusicResult> records = plugSearchMusicResultPlugSearchResult.getRecords();
+//                for (PlugSearchMusicResult record : records) {
+//                    String name = record.getName();
+//                    String tempArtist = record.getArtistName();
+//
+//                    ArrayList<String> tempArtisList = new ArrayList<>();
+//                    if (tempArtist.contains(",")){
+//                        String[] split = tempArtist.split(",");
+//                        for (String s : split) {
+//                            tempArtisList.add(s);
+//                        }
+//                    }else if (tempArtist.contains("/")){
+//                        String[] split = tempArtist.split("/");
+//                        for (String s : split) {
+//                            tempArtisList.add(s);
+//                        }
+//                    }else if (tempArtist.contains("&")){
+//                        String[] split = tempArtist.split("&");
+//                        for (String s : split) {
+//                            tempArtisList.add(s);
+//                        }
+//                    }else{
+//                        tempArtisList.add(tempArtist);
+//                    }
+//                   if (tempArtisList.size()==artists.size()&&tempArtisList.containsAll(artists)){
+//                       //对比完歌手对比名称
+//                       String regExp="[\n`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。， 、？]";
+//                       musicName = musicName.replaceAll(regExp,"");
+//                       name = name.replaceAll(regExp,"");
+//                       if (name.equals(musicName)){
+//                           //匹配
+//                           return record.getAlbumName();
+//                       }else{
+//                           //歌手对上了但是名字没对应上计算相似度80%以上的记录下来最终没找到用这个
+//                           //字面相似度
+//                           double charBasedSimilarityResult = Similarity.charBasedSimilarity(musicName, name);
+//                            //拼音相似度
+//                           double pinyinSimilarityResult = Similarity.pinyinSimilarity(musicName, name);
+//                           //概念相似度
+//                           double conceptSimilarityResult = Similarity.conceptSimilarity(musicName, name);
+//
+//                           if (charBasedSimilarityResult==1.0||pinyinSimilarityResult==1.0||conceptSimilarityResult==1.0){
+//                               //匹配
+//                               return record.getAlbumName();
+//                           }else if (charBasedSimilarityResult>0.7||pinyinSimilarityResult>0.7||conceptSimilarityResult>0.7){
+//                               //部分匹配的上等马(找出最厉害的上等马)
+//                               double max = NumberUtil.max(charBasedSimilarityResult, pinyinSimilarityResult, conceptSimilarityResult);
+//                                if (similarityValue>max){
+//                                    similarityName = record.getAlbumName() ;
+//                                    similarityValue =max;
+//                                }
+//                           }
+//                       }
+//                   }
+//
+//                }
+//            }
+//        }
+//        return similarityName;
+//    }
 
 
     public DownloadEntity download(String musicName, String artistName, String albumName ,String lyric, String image,String musicUrl){
