@@ -60,7 +60,7 @@ jobs:
       - name: Read Version from Artifact
         id: app_version
         run: |
-          VERSION=$(cat ./java-artifact/version.txt)
+          VERSION=$(cat version.txt)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "APP_VERSION: $VERSION"
 
