@@ -1,0 +1,60 @@
+name: Java CI with Maven and Release
+
+on:
+  push:
+    branches: [ 2.0 ] # 只在提交到2.0分支时触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: java-artifact
+          path: target/*.jar # 假设你的输出文件是.jar格式
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/2.0' }}
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: java-artifact
+      - name: Read Application Version
+        id: app_version
+        run: |
+          # 读取 application.yml 中的版本号
+          VERSION=$(yq r application.yml version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.app_version.outputs.version }}
+          release_name: Release ${{ steps.app_version.outputs.version }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./java-artifact/*.jar
+          asset_name: artifact.jar
+          asset_content_type: application/octet-stream
