@@ -32,7 +32,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
           echo "APP_VERSION: $VERSION"
-          echo "Version: $VERSION" > version.txt
+          echo "$VERSION" > version.txt
       - name: List Environment Variables
         run: env
       - name: Build with Maven
