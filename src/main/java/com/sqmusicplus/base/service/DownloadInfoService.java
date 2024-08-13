@@ -18,5 +18,7 @@ public interface DownloadInfoService extends IService<DownloadInfo> {
 
      Boolean add(DownloadInfo downloadInfo);
      Boolean add(List<DownloadInfo> downloadInfo);
+     boolean updateById(DownloadInfo entity);
+
 
 }

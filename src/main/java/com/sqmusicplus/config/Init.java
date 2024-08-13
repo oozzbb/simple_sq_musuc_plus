@@ -65,7 +65,7 @@ public class Init implements ApplicationRunner {
             if (aBoolean) {
                 log.info("subsonic服务连接正常");
             } else {
-                configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.subsonic.start").set("config_key", "false"));
+                configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.subsonic.start").set("config_value", "false"));
             }
             ArrayList<SubsonicPlayList> subsonicPlayList = subsonicHander.getSubsonicPlayList();
             for (SubsonicPlayList playList : subsonicPlayList) {
@@ -146,7 +146,7 @@ public class Init implements ApplicationRunner {
             try {
                 FreeCookieUtil.refreshCookies(qqconfigKey.getConfigValue(), configKey.getConfigValue());
             } catch (Exception e) {
-                configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.qqvip.open").set("config_key", "false"));
+                configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.qqvip.open").set("config_value", "false"));
                 log.error("获取QQvip失败请检查ip和qq是否准确已自动关闭该插件");
             }
         }

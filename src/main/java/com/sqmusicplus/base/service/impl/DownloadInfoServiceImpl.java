@@ -46,4 +46,9 @@ public class DownloadInfoServiceImpl extends ServiceImpl<DownloadInfoMapper, Dow
         downloadExcute.getDownloadInfo();
         return  save;
     }
+
+    @Override
+    public synchronized boolean updateById(DownloadInfo entity) {
+        return super.updateById(entity);
+    }
 }

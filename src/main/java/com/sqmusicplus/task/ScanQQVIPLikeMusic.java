@@ -62,7 +62,7 @@ public class ScanQQVIPLikeMusic {
             try {
                 FreeCookieUtil.refreshCookies(qqconfig.getConfigValue(), urlconfig.getConfigValue());
             } catch (Exception e) {
-                configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.qqvip.open").set("config_key", "false"));
+                configService.update(new UpdateWrapper<SqConfig>().eq("config_key", "plug.qqvip.open").set("config_value", "false"));
                 log.error("获取QQvip失败请检查ip和qq是否准确已自动关闭该插件");
             }
 
