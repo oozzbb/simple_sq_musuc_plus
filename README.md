@@ -33,13 +33,11 @@ https://github.com/59799517/sq_subsonic_desktop
 2. 运行jar包即）
 
 
-
 ## 打包docker方法
 
 1. 删除旧的包 docker rmi sqmusicplusserver
 2. 打包新的 docker build -t sqmusicplusserver .
-3. 运行 docker run -d --name="sqmusicplusserver"   -p 8022:8083 -v /mnt/user/media/newmusic:/music -v
-   /mnt/user/appdata/sqmusic:/config sqmusicplusserver
+3. 运行 docker run -d --name="sqmusicplusserver"   -p {你需要的端口号}:8083 -v /mnt/user/media/newmusic:/music sqmusicplusserver
 
 ### 运行图：
 
