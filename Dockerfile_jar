@@ -10,7 +10,5 @@ EXPOSE 8099
 
 VOLUME ["/music"]
 
-VOLUME ["/cache"]
-
 CMD ["java", "-jar", "app.jar"]
 

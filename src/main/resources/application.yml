@@ -4,10 +4,29 @@ spring:
   datasource:
 #    url: jdbc:sqlite::resource:sqlite/sqmusic.db
 #    url: jdbc:sqlite:/D:\\music\\sqmusic.db
-    url: jdbc:sqlite:/cache/sqmusic.db
-    driver-class-name: org.sqlite.JDBC
-    username:
-    password:
+#    url: jdbc:sqlite:/cache/sqmusic.db
+    url: jdbc:mysql://${DB_IP:localhost}:${DB_PORT:3306}/${DB_NAME:sqmusic}?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=UTC&rewriteBatchedStatements=true&allowMultiQueries=true
+    driver-class-name: com.mysql.jdbc.Driver
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    type: com.zaxxer.hikari.HikariDataSource
+    # 连接池
+    hikari:
+      #连接池名
+      pool-name: DateHikariCP
+      #最小空闲连接数
+      minimum-idle: 5
+      # 空闲连接存活最大时间，默认600000（10分钟）
+      idle-timeout: 180000
+      # 连接池最大连接数，默认是10
+      maximum-pool-size: 10
+      # 此属性控制从池返回的连接的默认自动提交行为,默认值：true
+      auto-commit: true
+      # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
+      max-lifetime: 1800000
+      # 数据库连接超时时间,默认30秒，即30000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
   jackson:
     default-property-inclusion: non_null
   profiles:
@@ -17,11 +36,9 @@ spring:
   web:
     resources:
       static-locations: classpath:/static/**
-  cache:
-    ehcache:
-      config: classpath:ehcache.xml
   main:
     allow-circular-references: true
+    banner-mode: off
 mybatis-plus:
   # 搜索指定包别名
   typeAliasesPackage: com.sqmusicplus.*.entity
@@ -35,6 +52,7 @@ mybatis-plus:
     db-config:
 #      select-strategy: NOT_NULL
       select-strategy: NOT_NULL
+    banner: false
 
 # 日志配置
 logging:
@@ -56,5 +74,7 @@ sa-token:
   token-style: uuid
   # 是否输出操作日志
   is-log: false
+  is-print: false
 
-version: 2.12.14.1
+version: 2.13.0
+

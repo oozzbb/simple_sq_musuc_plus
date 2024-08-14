@@ -15,11 +15,9 @@ https://support.emby.media/support/solutions/articles/44001159113-music-naming
 
 ## 整体配置
 
-1. 登录用户名密码在 db文件中修改 （默认账号 admin 密码 admin）
-2. 文件下载路径 db文件中修改 ---> musicPath
-3. 其余配置 application-music.yml 请自行查看根据情况修改
-4. 缓存 ehcache.xml--->diskStore
-5. 日志 logback.xml---->property--->log.path
+1. 登录用户名密码（默认账号 admin 密码 admin）
+2. 启动数据库后自动创建数据库等
+3. 如需哦修改配置则去项目的设置中修改
 
 
 
