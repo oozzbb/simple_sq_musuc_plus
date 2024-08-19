@@ -2,6 +2,7 @@
 
 
 ## 更新参考
+支持PWA
 
 [updateLog.md](updateLog.md)
 ## 项目描述
