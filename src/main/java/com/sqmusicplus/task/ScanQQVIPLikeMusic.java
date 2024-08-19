@@ -124,6 +124,7 @@ public class ScanQQVIPLikeMusic {
                 sqConfig.setConfigValue(allalbummids);
                 sqConfig.setConfigName("QQVIP已经同步过的专辑id（删除则重新同步一次）");
                 sqConfig.setType("input");
+                sqConfig.setConfigShow("N");
                 configService.save(sqConfig);
 
             }
@@ -276,6 +277,7 @@ public class ScanQQVIPLikeMusic {
                 sqConfig.setConfigValue(string);
                 sqConfig.setType("input");
                 sqConfig.setConfigName("qqvip("+dissname+")歌单已下载id缓存 删除则回重新同步数据");
+                sqConfig.setConfigShow("N");
                 configService.save(sqConfig);
             }
             //循环找出歌曲详情

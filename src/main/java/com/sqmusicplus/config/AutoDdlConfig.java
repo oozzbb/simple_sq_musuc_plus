@@ -21,7 +21,7 @@ import java.util.List;
 public class AutoDdlConfig   extends SimpleDdl {
     @Override
     public List<String> getSqlFiles() {
-        return CollUtil.newArrayList("db/sqmusic.sql","db/insert_config.sql","db/v2.13.1_updat.sql");
+        return CollUtil.newArrayList("db/sqmusic.sql","db/insert_config.sql","db/v2.13.1_updat.sql","db/v2.13.3_update.sql");
     }
 
     @Bean("ddlApplicationRunner")

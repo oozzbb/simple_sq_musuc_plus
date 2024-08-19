@@ -18,7 +18,7 @@ public class MusicInfoNeteaseResult {
     @JSONField(name = "privileges")
     private List<PrivilegesDTO> privileges;
     @JSONField(name = "code")
-    private Integer code;
+    private Long code;
     @JSONField(name = "songs")
     private List<SongsDTO> songs;
 
@@ -30,11 +30,11 @@ public class MusicInfoNeteaseResult {
         this.privileges = privileges;
     }
 
-    public Integer getCode() {
+    public Long getCode() {
         return code;
     }
 
-    public void setCode(Integer code) {
+    public void setCode(Long code) {
         this.code = code;
     }
 
@@ -48,43 +48,43 @@ public class MusicInfoNeteaseResult {
 
     public static class PrivilegesDTO {
         @JSONField(name = "flag")
-        private Integer flag;
+        private Long flag;
         @JSONField(name = "dlLevel")
         private String dlLevel;
         @JSONField(name = "subp")
-        private Integer subp;
+        private Long subp;
         @JSONField(name = "fl")
-        private Integer fl;
+        private Long fl;
         @JSONField(name = "fee")
-        private Integer fee;
+        private Long fee;
         @JSONField(name = "dl")
-        private Integer dl;
+        private Long dl;
         @JSONField(name = "plLevel")
         private String plLevel;
         @JSONField(name = "maxBrLevel")
         private String maxBrLevel;
         @JSONField(name = "rightSource")
-        private Integer rightSource;
+        private Long rightSource;
         @JSONField(name = "maxbr")
-        private Integer maxbr;
+        private Long maxbr;
         @JSONField(name = "id")
-        private Integer id;
+        private Long id;
         @JSONField(name = "sp")
-        private Integer sp;
+        private Long sp;
         @JSONField(name = "payed")
-        private Integer payed;
+        private Long payed;
         @JSONField(name = "st")
-        private Integer st;
+        private Long st;
         @JSONField(name = "chargeInfoList")
         private List<ChargeInfoListDTO> chargeInfoList;
         @JSONField(name = "freeTrialPrivilege")
         private FreeTrialPrivilegeDTO freeTrialPrivilege;
         @JSONField(name = "downloadMaxbr")
-        private Integer downloadMaxbr;
+        private Long downloadMaxbr;
         @JSONField(name = "downloadMaxBrLevel")
         private String downloadMaxBrLevel;
         @JSONField(name = "cp")
-        private Integer cp;
+        private Long cp;
         @JSONField(name = "preSell")
         private Boolean preSell;
         @JSONField(name = "playMaxBrLevel")
@@ -94,17 +94,17 @@ public class MusicInfoNeteaseResult {
         @JSONField(name = "toast")
         private Boolean toast;
         @JSONField(name = "playMaxbr")
-        private Integer playMaxbr;
+        private Long playMaxbr;
         @JSONField(name = "flLevel")
         private String flLevel;
         @JSONField(name = "pl")
-        private Integer pl;
+        private Long pl;
 
-        public Integer getFlag() {
+        public Long getFlag() {
             return flag;
         }
 
-        public void setFlag(Integer flag) {
+        public void setFlag(Long flag) {
             this.flag = flag;
         }
 
@@ -116,35 +116,35 @@ public class MusicInfoNeteaseResult {
             this.dlLevel = dlLevel;
         }
 
-        public Integer getSubp() {
+        public Long getSubp() {
             return subp;
         }
 
-        public void setSubp(Integer subp) {
+        public void setSubp(Long subp) {
             this.subp = subp;
         }
 
-        public Integer getFl() {
+        public Long getFl() {
             return fl;
         }
 
-        public void setFl(Integer fl) {
+        public void setFl(Long fl) {
             this.fl = fl;
         }
 
-        public Integer getFee() {
+        public Long getFee() {
             return fee;
         }
 
-        public void setFee(Integer fee) {
+        public void setFee(Long fee) {
             this.fee = fee;
         }
 
-        public Integer getDl() {
+        public Long getDl() {
             return dl;
         }
 
-        public void setDl(Integer dl) {
+        public void setDl(Long dl) {
             this.dl = dl;
         }
 
@@ -164,51 +164,51 @@ public class MusicInfoNeteaseResult {
             this.maxBrLevel = maxBrLevel;
         }
 
-        public Integer getRightSource() {
+        public Long getRightSource() {
             return rightSource;
         }
 
-        public void setRightSource(Integer rightSource) {
+        public void setRightSource(Long rightSource) {
             this.rightSource = rightSource;
         }
 
-        public Integer getMaxbr() {
+        public Long getMaxbr() {
             return maxbr;
         }
 
-        public void setMaxbr(Integer maxbr) {
+        public void setMaxbr(Long maxbr) {
             this.maxbr = maxbr;
         }
 
-        public Integer getId() {
+        public Long getId() {
             return id;
         }
 
-        public void setId(Integer id) {
+        public void setId(Long id) {
             this.id = id;
         }
 
-        public Integer getSp() {
+        public Long getSp() {
             return sp;
         }
 
-        public void setSp(Integer sp) {
+        public void setSp(Long sp) {
             this.sp = sp;
         }
 
-        public Integer getPayed() {
+        public Long getPayed() {
             return payed;
         }
 
-        public void setPayed(Integer payed) {
+        public void setPayed(Long payed) {
             this.payed = payed;
         }
 
-        public Integer getSt() {
+        public Long getSt() {
             return st;
         }
 
-        public void setSt(Integer st) {
+        public void setSt(Long st) {
             this.st = st;
         }
 
@@ -228,11 +228,11 @@ public class MusicInfoNeteaseResult {
             this.freeTrialPrivilege = freeTrialPrivilege;
         }
 
-        public Integer getDownloadMaxbr() {
+        public Long getDownloadMaxbr() {
             return downloadMaxbr;
         }
 
-        public void setDownloadMaxbr(Integer downloadMaxbr) {
+        public void setDownloadMaxbr(Long downloadMaxbr) {
             this.downloadMaxbr = downloadMaxbr;
         }
 
@@ -244,11 +244,11 @@ public class MusicInfoNeteaseResult {
             this.downloadMaxBrLevel = downloadMaxBrLevel;
         }
 
-        public Integer getCp() {
+        public Long getCp() {
             return cp;
         }
 
-        public void setCp(Integer cp) {
+        public void setCp(Long cp) {
             this.cp = cp;
         }
 
@@ -284,11 +284,11 @@ public class MusicInfoNeteaseResult {
             this.toast = toast;
         }
 
-        public Integer getPlayMaxbr() {
+        public Long getPlayMaxbr() {
             return playMaxbr;
         }
 
-        public void setPlayMaxbr(Integer playMaxbr) {
+        public void setPlayMaxbr(Long playMaxbr) {
             this.playMaxbr = playMaxbr;
         }
 
@@ -300,11 +300,11 @@ public class MusicInfoNeteaseResult {
             this.flLevel = flLevel;
         }
 
-        public Integer getPl() {
+        public Long getPl() {
             return pl;
         }
 
-        public void setPl(Integer pl) {
+        public void setPl(Long pl) {
             this.pl = pl;
         }
 
@@ -333,23 +333,23 @@ public class MusicInfoNeteaseResult {
 
         public static class ChargeInfoListDTO {
             @JSONField(name = "rate")
-            private Integer rate;
+            private Long rate;
             @JSONField(name = "chargeType")
-            private Integer chargeType;
+            private Long chargeType;
 
-            public Integer getRate() {
+            public Long getRate() {
                 return rate;
             }
 
-            public void setRate(Integer rate) {
+            public void setRate(Long rate) {
                 this.rate = rate;
             }
 
-            public Integer getChargeType() {
+            public Long getChargeType() {
                 return chargeType;
             }
 
-            public void setChargeType(Integer chargeType) {
+            public void setChargeType(Long chargeType) {
                 this.chargeType = chargeType;
             }
         }
@@ -357,34 +357,34 @@ public class MusicInfoNeteaseResult {
 
     public static class SongsDTO {
         @JSONField(name = "no")
-        private Integer no;
+        private Long no;
         @JSONField(name = "rt")
         private String rt;
         @JSONField(name = "copyright")
-        private Integer copyright;
+        private Long copyright;
         @JSONField(name = "fee")
-        private Integer fee;
+        private Long fee;
         @JSONField(name = "mst")
-        private Integer mst;
+        private Long mst;
         @JSONField(name = "pst")
-        private Integer pst;
+        private Long pst;
         @JSONField(name = "pop")
-        private Integer pop;
+        private Long pop;
         @JSONField(name = "dt")
-        private Integer dt;
+        private Long dt;
         @JSONField(name = "rtype")
-        private Integer rtype;
+        private Long rtype;
         @JSONField(name = "s_id")
-        private Integer sId;
+        private Long sId;
 
         @JSONField(name = "resourceState")
         private Boolean resourceState;
         @JSONField(name = "id")
-        private Integer id;
+        private Long id;
         @JSONField(name = "sq")
         private SqDTO sq;
         @JSONField(name = "st")
-        private Integer st;
+        private Long st;
         @JSONField(name = "cd")
         private String cd;
         @JSONField(name = "publishTime")
@@ -392,11 +392,11 @@ public class MusicInfoNeteaseResult {
         @JSONField(name = "cf")
         private String cf;
         @JSONField(name = "originCoverType")
-        private Integer originCoverType;
+        private Long originCoverType;
         @JSONField(name = "h")
         private HDTO h;
         @JSONField(name = "mv")
-        private Integer mv;
+        private Long mv;
         @JSONField(name = "al")
         private AlDTO al;
         @JSONField(name = "l")
@@ -404,34 +404,34 @@ public class MusicInfoNeteaseResult {
         @JSONField(name = "m")
         private MDTO m;
         @JSONField(name = "version")
-        private Integer version;
+        private Long version;
         @JSONField(name = "cp")
-        private Integer cp;
+        private Long cp;
 
 
 
         @JSONField(name = "djId")
-        private Integer djId;
+        private Long djId;
         @JSONField(name = "single")
-        private Integer single;
+        private Long single;
         @JSONField(name = "ar")
         private List<ArDTO> ar;
         @JSONField(name = "ftype")
-        private Integer ftype;
+        private Long ftype;
         @JSONField(name = "t")
-        private Integer t;
+        private Long t;
         @JSONField(name = "v")
-        private Integer v;
+        private Long v;
         @JSONField(name = "name")
         private String name;
         @JSONField(name = "mark")
         private Long mark;
 
-        public Integer getNo() {
+        public Long getNo() {
             return no;
         }
 
-        public void setNo(Integer no) {
+        public void setNo(Long no) {
             this.no = no;
         }
 
@@ -443,67 +443,67 @@ public class MusicInfoNeteaseResult {
             this.rt = rt;
         }
 
-        public Integer getCopyright() {
+        public Long getCopyright() {
             return copyright;
         }
 
-        public void setCopyright(Integer copyright) {
+        public void setCopyright(Long copyright) {
             this.copyright = copyright;
         }
 
-        public Integer getFee() {
+        public Long getFee() {
             return fee;
         }
 
-        public void setFee(Integer fee) {
+        public void setFee(Long fee) {
             this.fee = fee;
         }
 
-        public Integer getMst() {
+        public Long getMst() {
             return mst;
         }
 
-        public void setMst(Integer mst) {
+        public void setMst(Long mst) {
             this.mst = mst;
         }
 
-        public Integer getPst() {
+        public Long getPst() {
             return pst;
         }
 
-        public void setPst(Integer pst) {
+        public void setPst(Long pst) {
             this.pst = pst;
         }
 
-        public Integer getPop() {
+        public Long getPop() {
             return pop;
         }
 
-        public void setPop(Integer pop) {
+        public void setPop(Long pop) {
             this.pop = pop;
         }
 
-        public Integer getDt() {
+        public Long getDt() {
             return dt;
         }
 
-        public void setDt(Integer dt) {
+        public void setDt(Long dt) {
             this.dt = dt;
         }
 
-        public Integer getRtype() {
+        public Long getRtype() {
             return rtype;
         }
 
-        public void setRtype(Integer rtype) {
+        public void setRtype(Long rtype) {
             this.rtype = rtype;
         }
 
-        public Integer getSId() {
+        public Long getSId() {
             return sId;
         }
 
-        public void setSId(Integer sId) {
+        public void setSId(Long sId) {
             this.sId = sId;
         }
 
@@ -518,11 +518,11 @@ public class MusicInfoNeteaseResult {
             this.resourceState = resourceState;
         }
 
-        public Integer getId() {
+        public Long getId() {
             return id;
         }
 
-        public void setId(Integer id) {
+        public void setId(Long id) {
             this.id = id;
         }
 
@@ -534,11 +534,11 @@ public class MusicInfoNeteaseResult {
             this.sq = sq;
         }
 
-        public Integer getSt() {
+        public Long getSt() {
             return st;
         }
 
-        public void setSt(Integer st) {
+        public void setSt(Long st) {
             this.st = st;
         }
 
@@ -566,11 +566,11 @@ public class MusicInfoNeteaseResult {
             this.cf = cf;
         }
 
-        public Integer getOriginCoverType() {
+        public Long getOriginCoverType() {
             return originCoverType;
         }
 
-        public void setOriginCoverType(Integer originCoverType) {
+        public void setOriginCoverType(Long originCoverType) {
             this.originCoverType = originCoverType;
         }
 
@@ -582,11 +582,11 @@ public class MusicInfoNeteaseResult {
             this.h = h;
         }
 
-        public Integer getMv() {
+        public Long getMv() {
             return mv;
         }
 
-        public void setMv(Integer mv) {
+        public void setMv(Long mv) {
             this.mv = mv;
         }
 
@@ -614,19 +614,19 @@ public class MusicInfoNeteaseResult {
             this.m = m;
         }
 
-        public Integer getVersion() {
+        public Long getVersion() {
             return version;
         }
 
-        public void setVersion(Integer version) {
+        public void setVersion(Long version) {
             this.version = version;
         }
 
-        public Integer getCp() {
+        public Long getCp() {
             return cp;
         }
 
-        public void setCp(Integer cp) {
+        public void setCp(Long cp) {
             this.cp = cp;
         }
 
@@ -634,19 +634,19 @@ public class MusicInfoNeteaseResult {
 
 
 
-        public Integer getDjId() {
+        public Long getDjId() {
             return djId;
         }
 
-        public void setDjId(Integer djId) {
+        public void setDjId(Long djId) {
             this.djId = djId;
         }
 
-        public Integer getSingle() {
+        public Long getSingle() {
             return single;
         }
 
-        public void setSingle(Integer single) {
+        public void setSingle(Long single) {
             this.single = single;
         }
 
@@ -658,27 +658,27 @@ public class MusicInfoNeteaseResult {
             this.ar = ar;
         }
 
-        public Integer getFtype() {
+        public Long getFtype() {
             return ftype;
         }
 
-        public void setFtype(Integer ftype) {
+        public void setFtype(Long ftype) {
             this.ftype = ftype;
         }
 
-        public Integer getT() {
+        public Long getT() {
             return t;
         }
 
-        public void setT(Integer t) {
+        public void setT(Long t) {
             this.t = t;
         }
 
-        public Integer getV() {
+        public Long getV() {
             return v;
         }
 
-        public void setV(Integer v) {
+        public void setV(Long v) {
             this.v = v;
         }
 
@@ -700,106 +700,106 @@ public class MusicInfoNeteaseResult {
 
         public static class SqDTO {
             @JSONField(name = "br")
-            private Integer br;
+            private Long br;
             @JSONField(name = "fid")
-            private Integer fid;
+            private Long fid;
             @JSONField(name = "size")
-            private Integer size;
+            private Long size;
             @JSONField(name = "vd")
-            private Integer vd;
+            private Long vd;
             @JSONField(name = "sr")
-            private Integer sr;
+            private Long sr;
 
-            public Integer getBr() {
+            public Long getBr() {
                 return br;
             }
 
-            public void setBr(Integer br) {
+            public void setBr(Long br) {
                 this.br = br;
             }
 
-            public Integer getFid() {
+            public Long getFid() {
                 return fid;
             }
 
-            public void setFid(Integer fid) {
+            public void setFid(Long fid) {
                 this.fid = fid;
             }
 
-            public Integer getSize() {
+            public Long getSize() {
                 return size;
             }
 
-            public void setSize(Integer size) {
+            public void setSize(Long size) {
                 this.size = size;
             }
 
-            public Integer getVd() {
+            public Long getVd() {
                 return vd;
             }
 
-            public void setVd(Integer vd) {
+            public void setVd(Long vd) {
                 this.vd = vd;
             }
 
-            public Integer getSr() {
+            public Long getSr() {
                 return sr;
             }
 
-            public void setSr(Integer sr) {
+            public void setSr(Long sr) {
                 this.sr = sr;
             }
         }
 
         public static class HDTO {
             @JSONField(name = "br")
-            private Integer br;
+            private Long br;
             @JSONField(name = "fid")
-            private Integer fid;
+            private Long fid;
             @JSONField(name = "size")
-            private Integer size;
+            private Long size;
             @JSONField(name = "vd")
-            private Integer vd;
+            private Long vd;
             @JSONField(name = "sr")
-            private Integer sr;
+            private Long sr;
 
-            public Integer getBr() {
+            public Long getBr() {
                 return br;
             }
 
-            public void setBr(Integer br) {
+            public void setBr(Long br) {
                 this.br = br;
             }
 
-            public Integer getFid() {
+            public Long getFid() {
                 return fid;
             }
 
-            public void setFid(Integer fid) {
+            public void setFid(Long fid) {
                 this.fid = fid;
             }
 
-            public Integer getSize() {
+            public Long getSize() {
                 return size;
             }
 
-            public void setSize(Integer size) {
+            public void setSize(Long size) {
                 this.size = size;
             }
 
-            public Integer getVd() {
+            public Long getVd() {
                 return vd;
             }
 
-            public void setVd(Integer vd) {
+            public void setVd(Long vd) {
                 this.vd = vd;
             }
 
-            public Integer getSr() {
+            public Long getSr() {
                 return sr;
             }
 
-            public void setSr(Integer sr) {
+            public void setSr(Long sr) {
                 this.sr = sr;
             }
         }
@@ -815,7 +815,7 @@ public class MusicInfoNeteaseResult {
             @JSONField(name = "pic_str")
             private String picStr;
             @JSONField(name = "id")
-            private Integer id;
+            private Long id;
             @JSONField(name = "pic")
             private Long pic;
 
@@ -847,11 +847,11 @@ public class MusicInfoNeteaseResult {
                 this.picStr = picStr;
             }
 
-            public Integer getId() {
+            public Long getId() {
                 return id;
             }
 
-            public void setId(Integer id) {
+            public void setId(Long id) {
                 this.id = id;
             }
 
@@ -866,106 +866,106 @@ public class MusicInfoNeteaseResult {
 
         public static class LDTO {
             @JSONField(name = "br")
-            private Integer br;
+            private Long br;
             @JSONField(name = "fid")
-            private Integer fid;
+            private Long fid;
             @JSONField(name = "size")
-            private Integer size;
+            private Long size;
             @JSONField(name = "vd")
-            private Integer vd;
+            private Long vd;
             @JSONField(name = "sr")
-            private Integer sr;
+            private Long sr;
 
-            public Integer getBr() {
+            public Long getBr() {
                 return br;
             }
 
-            public void setBr(Integer br) {
+            public void setBr(Long br) {
                 this.br = br;
             }
 
-            public Integer getFid() {
+            public Long getFid() {
                 return fid;
             }
 
-            public void setFid(Integer fid) {
+            public void setFid(Long fid) {
                 this.fid = fid;
             }
 
-            public Integer getSize() {
+            public Long getSize() {
                 return size;
             }
 
-            public void setSize(Integer size) {
+            public void setSize(Long size) {
                 this.size = size;
             }
 
-            public Integer getVd() {
+            public Long getVd() {
                 return vd;
             }
 
-            public void setVd(Integer vd) {
+            public void setVd(Long vd) {
                 this.vd = vd;
             }
 
-            public Integer getSr() {
+            public Long getSr() {
                 return sr;
             }
 
-            public void setSr(Integer sr) {
+            public void setSr(Long sr) {
                 this.sr = sr;
             }
         }
 
         public static class MDTO {
             @JSONField(name = "br")
-            private Integer br;
+            private Long br;
             @JSONField(name = "fid")
-            private Integer fid;
+            private Long fid;
             @JSONField(name = "size")
-            private Integer size;
+            private Long size;
             @JSONField(name = "vd")
-            private Integer vd;
+            private Long vd;
             @JSONField(name = "sr")
-            private Integer sr;
+            private Long sr;
 
-            public Integer getBr() {
+            public Long getBr() {
                 return br;
             }
 
-            public void setBr(Integer br) {
+            public void setBr(Long br) {
                 this.br = br;
             }
 
-            public Integer getFid() {
+            public Long getFid() {
                 return fid;
             }
 
-            public void setFid(Integer fid) {
+            public void setFid(Long fid) {
                 this.fid = fid;
             }
 
-            public Integer getSize() {
+            public Long getSize() {
                 return size;
             }
 
-            public void setSize(Integer size) {
+            public void setSize(Long size) {
                 this.size = size;
             }
 
-            public Integer getVd() {
+            public Long getVd() {
                 return vd;
             }
 
-            public void setVd(Integer vd) {
+            public void setVd(Long vd) {
                 this.vd = vd;
             }
 
-            public Integer getSr() {
+            public Long getSr() {
                 return sr;
             }
 
-            public void setSr(Integer sr) {
+            public void setSr(Long sr) {
                 this.sr = sr;
             }
         }
@@ -976,7 +976,7 @@ public class MusicInfoNeteaseResult {
 
 
 
-            private Integer id;
+            private Long id;
 
             public String getName() {
                 return name;
@@ -989,11 +989,11 @@ public class MusicInfoNeteaseResult {
 
 
 
-            public Integer getId() {
+            public Long getId() {
                 return id;
             }
 
-            public void setId(Integer id) {
+            public void setId(Long id) {
                 this.id = id;
             }
         }

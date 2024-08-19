@@ -6,10 +6,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sqmusicplus.base.entity.DownloadInfo;
+import com.sqmusicplus.base.entity.vo.DownloadInfoSearch;
 import com.sqmusicplus.base.service.DownloadInfoService;
 import com.sqmusicplus.config.AjaxResult;
 import com.sqmusicplus.download.DownloadStatus;
 import com.sqmusicplus.task.ScanQQVIPLikeMusic;
+import com.sqmusicplus.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +41,49 @@ public class DownloadInfoController {
         downloadInfoLambdaQueryWrapper.orderByDesc(DownloadInfo::getDownloadTime);
         Page<DownloadInfo> page = downloadInfoService.page(new Page<>(pageIndex, pageSize),downloadInfoLambdaQueryWrapper);
         return AjaxResult.success(page);
+    }
+
+    @PostMapping("/getDownloadInfo/search")
+    public AjaxResult getDownloadInfo(@RequestBody DownloadInfoSearch downloadInfo){
+        LambdaQueryWrapper<DownloadInfo> downloadInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        downloadInfoLambdaQueryWrapper.eq(StringUtils.isNotEmpty(downloadInfo.getStatus()),DownloadInfo::getStatus, downloadInfo.getStatus());
+        downloadInfoLambdaQueryWrapper.between(downloadInfo.getDownloadTimeStart()!=null&&downloadInfo.getDownloadTimeEnd()!=null,DownloadInfo::getDownloadTime, downloadInfo.getDownloadTimeStart(), downloadInfo.getDownloadTimeEnd());
+        downloadInfoLambdaQueryWrapper.like(StringUtils.isNotEmpty(downloadInfo.getDownloadMusicname()),DownloadInfo::getDownloadMusicname, downloadInfo.getDownloadMusicname());
+        downloadInfoLambdaQueryWrapper.like(StringUtils.isNotEmpty(downloadInfo.getDownloadArtistname()),DownloadInfo::getDownloadArtistname, downloadInfo.getDownloadArtistname());
+        downloadInfoLambdaQueryWrapper.like(StringUtils.isNotEmpty(downloadInfo.getDownloadAlbumname()),DownloadInfo::getDownloadAlbumname, downloadInfo.getDownloadAlbumname());
+        downloadInfoLambdaQueryWrapper.eq(StringUtils.isNotEmpty(downloadInfo.getDownloadType()),DownloadInfo::getDownloadType, downloadInfo.getDownloadType());
+        downloadInfoLambdaQueryWrapper.eq(StringUtils.isNotEmpty(downloadInfo.getAudioBook()),DownloadInfo::getAudioBook, downloadInfo.getAudioBook());
+        downloadInfoLambdaQueryWrapper.orderByDesc(DownloadInfo::getDownloadTime);
+        Page<DownloadInfo> page = downloadInfoService.page(new Page<>(downloadInfo.getPageIndex(), downloadInfo.getPageSize()),downloadInfoLambdaQueryWrapper);
+        return AjaxResult.success(page);
+    }
+
+    /**
+     * 删除任务
+     * @param downloadInfo
+     * @return
+     */
+    @PostMapping("/deleteDownloadInfo")
+    public AjaxResult deleteDownloadInfo(@RequestBody DownloadInfo downloadInfo){
+        Integer id = downloadInfo.getId();
+        if (id!=null){
+            downloadInfoService.removeById(id);
+            return AjaxResult.success();
+        }
+        return AjaxResult.error();
+
+    }
+    @PostMapping("/refresh/status")
+    public AjaxResult updateDownloadInfo(@RequestBody DownloadInfo downloadInfo){
+        Integer id = downloadInfo.getId();
+        if (id!=null){
+            DownloadInfo updownloadInfo = new DownloadInfo();
+            updownloadInfo.setStatus(DownloadStatus.waiting.getValue());
+            updownloadInfo.setId(id);
+            downloadInfoService.updateById(updownloadInfo);
+            return AjaxResult.success();
+        }
+        return AjaxResult.error();
     }
 
 

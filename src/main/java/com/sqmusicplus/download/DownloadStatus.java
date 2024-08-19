@@ -2,10 +2,10 @@ package com.sqmusicplus.download;
 
 /**
  * @Classname DownloadStatus
- * @Description TODO
+ * @Description 下载状态
  * @Version 1.0.0
  * @Date 2023/8/23 15:00
- * @Created by Administrator
+ * @Created by SQ
  */
 public enum DownloadStatus {
 

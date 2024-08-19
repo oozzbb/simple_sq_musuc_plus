@@ -1,9 +1,12 @@
 package com.sqmusicplus.base.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -34,6 +37,8 @@ public class DownloadInfo implements Serializable {
     private String downloadType;
 
     @TableField("download_time")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private Date downloadTime;
 
     @TableField("download_file")
