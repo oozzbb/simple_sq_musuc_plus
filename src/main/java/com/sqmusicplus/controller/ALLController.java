@@ -170,6 +170,12 @@ public class ALLController {
         PlugBrType finalPlugType = plugType;
         Music music =null;
         music = searchHanderAbstract.querySongById(downloadSong.getId());
+        ArrayList<PlugBrType> bits = music.getBits();
+        //找出bit最大的
+        if (bits.size()>0){
+            finalPlugType = bits.stream().max(Comparator.comparing(PlugBrType::getBit)).get();
+
+        }
         Music finalMusic = music;
             DownloadInfo downloadInfo = new DownloadInfo().setDownloadMusicId(finalMusic.getId())
                     .setDownloadBrType(finalPlugType.getValue())
@@ -230,8 +236,6 @@ public class ALLController {
         if (searchHanderAbstract==null){
             return AjaxResult.error("未知的搜索类型");
         }
-
-
         SearchHanderAbstract finalSearchHanderAbstract = searchHanderAbstract;
         threadPoolTaskExecutor.execute(()->{
             PlugBrType plugType;

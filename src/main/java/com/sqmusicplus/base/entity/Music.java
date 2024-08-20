@@ -2,12 +2,14 @@ package com.sqmusicplus.base.entity;
 
 import com.alibaba.fastjson.JSONObject;
 import com.sqmusicplus.config.EnumValue;
+import com.sqmusicplus.plug.base.PlugBrType;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 /**
  * <p>
@@ -143,6 +145,12 @@ public class Music  implements Serializable {
     @EnumValue(intValues = {128,192,320,1000,2000},message = "仅支持 128,192,320,1000,2000,3000(QQ) 码率")
     private Integer bit;
     private String PlayUrl;
+    /**
+     * 支持的码率
+     */
+    private ArrayList<PlugBrType> Bits;
+
+
 
 
 

@@ -335,6 +335,21 @@ public class QQSearchEntity {
         String albumImage = albumImageconfig.replaceAll("#\\{pmid}", albumpmid);
         String artistId = mapper1.getArray("singer").getMapper(0).getString("mid");
         Array singer = mapper1.getArray("singer");
+        Long flac = mapper1.getMapper("file").getLong("size_flac");
+        Long mp3320 = mapper1.getMapper("file").getLong("size_320mp3");
+        Long mp3128 = mapper1.getMapper("file").getLong("size_128mp3");
+        ArrayList<PlugBrType> longs = new ArrayList<>();
+        if (flac != null&&flac.longValue()>0){
+            longs.add(PlugBrType.QQVIP_Flac_2000);
+        }
+        if (mp3320 != null&&mp3320.longValue()>0){
+            longs.add(PlugBrType.QQVIP_MP3_320);
+        }
+        if (mp3128 != null&&mp3128.longValue()>0){
+            longs.add(PlugBrType.QQVIP_MP3_128);
+        }
+
+
         ArrayList<String> strings = new ArrayList<>();
         singer.forEach((i,e)->{
             String string = e.toMapper().getString("name");
@@ -349,7 +364,8 @@ public class QQSearchEntity {
                 .setMusicName(name).
                 setOther(JSONObject.parseObject(mapper1.toString()))
                 .setAlbumId(albumid)
-                .setArtistsId(artistId);
+                .setArtistsId(artistId)
+                .setBits(longs);
         return  music;
     }
 

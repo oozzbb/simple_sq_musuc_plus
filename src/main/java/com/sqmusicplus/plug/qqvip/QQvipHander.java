@@ -43,10 +43,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @Classname QQvipHander
- * @Description TODO
+ * @Description QQVIP处理器
  * @Version 1.0.0
  * @Date 2024/6/27 16:29
- * @Created by Administrator
+ * @Created by SQ
  */
 @Slf4j
 @Component("qqvipHander")
@@ -139,7 +139,6 @@ public class QQvipHander extends SearchHanderAbstract {
         String type = brType.getValue();
         JSONObject jsonObject = new JSONObject();
         String[] split = musicId.split(",");
-
         if (musicId.contains(",")){
             jsonObject.put("id", split[0]);
             jsonObject.put("mediaId", split[1]);
