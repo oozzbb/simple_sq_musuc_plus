@@ -425,10 +425,30 @@ public class QQSearchEntity {
             String string = e.toMapper().getMapper("songInfo").getString("name");
             String mid = e.toMapper().getMapper("songInfo").getString("mid");
             String albumname =  e.toMapper().getMapper("songInfo").getMapper("album").getString("name");
-            String aartist = e.toMapper().getMapper("songInfo").getArray("singer").getMapper(0).getString("name");
+//            String aartist = e.toMapper().getMapper("songInfo").getArray("singer").getMapper(0).getString("name");
+            Array singer = e.toMapper().getMapper("songInfo").getArray("singer");
+            ArrayList<String> strings = new ArrayList<>();
+            singer.forEach((c,x)->{
+                String name = x.toMapper().getString("name");
+                strings.add(name);
+            });
+            Long flac = e.toMapper().getMapper("songInfo").getMapper("file").getLong("size_flac");
+            Long mp3320 = e.toMapper().getMapper("songInfo").getMapper("file").getLong("size_320mp3");
+            Long mp3128 = e.toMapper().getMapper("songInfo").getMapper("file").getLong("size_128mp3");
+            ArrayList<PlugBrType> longs = new ArrayList<>();
+            if (flac != null&&flac.longValue()>0){
+                longs.add(PlugBrType.QQVIP_Flac_2000);
+            }
+            if (mp3320 != null&&mp3320.longValue()>0){
+                longs.add(PlugBrType.QQVIP_MP3_320);
+            }
+            if (mp3128 != null&&mp3128.longValue()>0){
+                longs.add(PlugBrType.QQVIP_MP3_128);
+            }
+
             String albumImageconfig = qqConfig.getAlbumImage();
             String url =  albumImageconfig.replaceAll("#\\{pmid}", e.toMapper().getMapper("songInfo").getMapper("album").getString("pmid"));
-            Music music = new Music().setId(mid).setMusicName(string).setMusicAlbum(albumname).setMusicArtists(aartist).setMusicImage(url).setOther(JSONObject.parseObject(e.toString()));
+            Music music = new Music().setId(mid).setMusicName(string).setMusicAlbum(albumname).setMusicArtists(StringUtils.join(strings,"&")).setMusicImage(url).setOther(JSONObject.parseObject(e.toString())).setBits(longs);
             collect.add(music);
         });
         return collect;

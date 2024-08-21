@@ -36,6 +36,7 @@ import top.yumbo.util.music.musicImpl.qq.QQMusicInfo;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -219,11 +220,17 @@ public class QQvipHander extends SearchHanderAbstract {
             if (!Boolean.getBoolean(albumSingerUnity.getConfigValue()) && !isAudioBook) {
                 change.set(md.getMusicArtists());
             }
+            PlugBrType plugBrType =null;
+            if(md.getBits()!=null&&md.getBits().size()>0){
+                ArrayList<PlugBrType> bits = md.getBits();
+                //找出最大的码率
+                 plugBrType = bits.stream().max(Comparator.comparing(PlugBrType::getBit)).get();
+            }
             if (isAudioBook) {
-                downloadEntities.add(new DownloadEntity("qqvipHander",md.getId(), brType, md.getMusicName(), artist, albumName, isAudioBook));
+                downloadEntities.add(new DownloadEntity("qqvipHander",md.getId(), plugBrType==null?brType:plugBrType, md.getMusicName(), artist, albumName, isAudioBook));
             } else {
                 //添加到缓存
-                downloadEntities.add(new DownloadEntity("qqvipHander",md.getId(), brType, md.getMusicName(), change.get(), md.getMusicAlbum()));
+                downloadEntities.add(new DownloadEntity("qqvipHander",md.getId(), plugBrType==null?brType:plugBrType, md.getMusicName(), change.get(), md.getMusicAlbum()));
             }
 
         });
