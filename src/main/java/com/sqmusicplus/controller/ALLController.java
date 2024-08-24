@@ -172,9 +172,8 @@ public class ALLController {
         music = searchHanderAbstract.querySongById(downloadSong.getId());
         ArrayList<PlugBrType> bits = music.getBits();
         //找出bit最大的
-        if (bits.size()>0){
+        if (bits!=null&&bits.size()>0){
             finalPlugType = bits.stream().max(Comparator.comparing(PlugBrType::getBit)).get();
-
         }
         Music finalMusic = music;
             DownloadInfo downloadInfo = new DownloadInfo().setDownloadMusicId(finalMusic.getId())

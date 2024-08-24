@@ -110,6 +110,40 @@ class SimpleSqMusucPlusApplicationTests {
             System.out.println("下载失败XXX:");
             System.out.println(onComplete);
         });
+//
+//
+//        String url = "https://m.lanzouj.com/i6h9c1lbimdc";
+//        String downloadUrl = getDownloadUrl(url);
+//
+//
+//        File file = new File("D:\\temp\\sq\\download\\ccc.flac");
+////        boolean download = DownloadUtils.download(url, file);
+//        HashMap<String, String> stringStringHashMap = new HashMap<>();
+//        stringStringHashMap.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+//
+//
+//        DownloadUtils.download(downloadUrl, file, stringStringHashMap,onProcess->{
+//            long doneBytes = onProcess.getDoneBytes();   // 已下载字节数
+//            long totalBytes = onProcess.getTotalBytes(); // 总共的字节数
+//            double rate = onProcess.getRate();           // 已下载的比例
+//            boolean isDone = onProcess.isDone();         // 是否下载完成
+//            System.out.println("下载中");
+//            System.out.println("已下载字节数："+doneBytes);
+//            System.out.println("总共的字节数"+totalBytes);
+//            System.out.println("已下载的比例"+rate);
+//            System.out.println("是否下载完成"+isDone);
+//
+//        },onSuccess->{
+//            System.out.println("下载成功");
+//
+//        },onFailure -> {
+//            System.out.println("下载失败:");
+//            onFailure.getException().printStackTrace();
+//
+//        },onComplete->{
+//            System.out.println("下载失败XXX:");
+//            System.out.println(onComplete);
+//        });
 
 //        System.out.println(download);
 //        String word1 = "不枉此生(电视剧《雪山飞狐》主题曲)";
