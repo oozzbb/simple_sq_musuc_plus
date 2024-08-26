@@ -438,6 +438,8 @@ public class QQSearchEntity {
             Long flac = e.toMapper().getMapper("songInfo").getMapper("file").getLong("size_flac");
             Long mp3320 = e.toMapper().getMapper("songInfo").getMapper("file").getLong("size_320mp3");
             Long mp3128 = e.toMapper().getMapper("songInfo").getMapper("file").getLong("size_128mp3");
+            String media_mid = e.toMapper().getMapper("songInfo").getMapper("file").getString("media_mid");
+
             ArrayList<PlugBrType> longs = new ArrayList<>();
             if (flac != null&&flac.longValue()>0){
                 longs.add(PlugBrType.QQVIP_Flac_2000);
@@ -451,6 +453,9 @@ public class QQSearchEntity {
 
             String albumImageconfig = qqConfig.getAlbumImage();
             String url =  albumImageconfig.replaceAll("#\\{pmid}", e.toMapper().getMapper("songInfo").getMapper("album").getString("pmid"));
+           if (StringUtils.isNotEmpty(media_mid)){
+               mid = mid+","+media_mid;
+           }
             Music music = new Music().setId(mid).setMusicName(string).setMusicAlbum(albumname).setMusicArtists(StringUtils.join(strings,"&")).setMusicImage(url).setOther(JSONObject.parseObject(e.toString())).setBits(longs);
             collect.add(music);
         });
