@@ -338,6 +338,7 @@ public class QQSearchEntity {
         Long flac = mapper1.getMapper("file").getLong("size_flac");
         Long mp3320 = mapper1.getMapper("file").getLong("size_320mp3");
         Long mp3128 = mapper1.getMapper("file").getLong("size_128mp3");
+        String mediaMid = mapper1.getMapper("file").getString("media_mid");
         ArrayList<PlugBrType> longs = new ArrayList<>();
         if (flac != null&&flac.longValue()>0){
             longs.add(PlugBrType.QQVIP_Flac_2000);
@@ -348,14 +349,16 @@ public class QQSearchEntity {
         if (mp3128 != null&&mp3128.longValue()>0){
             longs.add(PlugBrType.QQVIP_MP3_128);
         }
-
-
         ArrayList<String> strings = new ArrayList<>();
         singer.forEach((i,e)->{
             String string = e.toMapper().getString("name");
             strings.add(string);
         });
         String lyricResult = toPlugLyricResult(mid,qqConfig);
+
+        if (StringUtils.isNotEmpty(mediaMid)){
+            mid=mid+","+mediaMid;
+        }
         Music music = new Music().setId(mid)
                 .setMusicImage(albumImage)
                 .setMusicLyric(lyricResult)

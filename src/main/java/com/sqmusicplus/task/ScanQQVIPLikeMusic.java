@@ -187,6 +187,10 @@ public class ScanQQVIPLikeMusic {
         if (collectresult == 100){
             Mapper collectdata = collectmapper.getMapper("data");
             Array list = collectdata.getArray("list");
+            if (list==null|| list.isEmpty()){
+                log.info("QQVIP同步收藏歌单失败获取歌单失败(未找到歌曲信息)");
+                return;
+            }
             list.forEach((index, item) -> {
                     String diss_name = item.toMapper().getString("dissname");
                     if (!excludeNames.contains(diss_name)){
@@ -288,6 +292,8 @@ public class ScanQQVIPLikeMusic {
                 String songid = item.toMapper().getString("songid");
                 if (finalAddSongIds1.contains(songid)){
                     String songmid = item.toMapper().getString("songmid");
+                    String strMediaMid = item.toMapper().getString("strMediaMid");
+
                     int sizeflac = item.toMapper().getInt("sizeflac");
                     int size320 = item.toMapper().getInt("size320");
                     int size128 = item.toMapper().getInt("size128");
