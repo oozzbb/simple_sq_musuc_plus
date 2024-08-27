@@ -164,7 +164,14 @@ public class QQvipHander extends SearchHanderAbstract {
             Integer code = jsonObject1.getInteger("result");
             if (code!=null&&code.intValue()==100){
                 HashMap<String, String> stringStringHashMap = new HashMap<>();
-                stringStringHashMap.put("url", jsonObject1.getString("data"));
+                String downloadurl = jsonObject1.getString("data");
+                if (downloadurl.contains("undefined")){
+                    HashMap<String, String> downloadUrl = getDownloadUrl(jsonObject.getString("id"), brType);
+                    if (downloadUrl!=null){
+                        return downloadUrl;
+                    }
+                }
+                stringStringHashMap.put("url", downloadurl);
                 stringStringHashMap.put("type", brType.getType());
                 stringStringHashMap.put("bit", brType.getBit().toString());
                 return stringStringHashMap;
@@ -172,6 +179,10 @@ public class QQvipHander extends SearchHanderAbstract {
         } catch (IOException e) {
             e.printStackTrace();
             log.error("获取下载地址失败music地址:{}" ,musicId);
+            HashMap<String, String> downloadUrl = getDownloadUrl(jsonObject.getString("id"), brType);
+            if (downloadUrl!=null){
+                return downloadUrl;
+            }
             return null;
         }
         return null;
