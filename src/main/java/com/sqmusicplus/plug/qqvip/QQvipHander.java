@@ -64,7 +64,7 @@ public class QQvipHander extends SearchHanderAbstract {
     private SqConfigService configService;
 
 
-    public void initPlug(){
+    public void initPlug() {
         QQVipSearchEntity qqSearchEntity = new QQVipSearchEntity();
         qqSearchEntity.setPlugName("qqvip");
         qqHander.setQqSearchEntity(qqSearchEntity);
@@ -127,7 +127,7 @@ public class QQvipHander extends SearchHanderAbstract {
 
     @Override
     public List<Album> getAlbumsByArtist(String artistId, Integer pageIndex, Integer pageSize) {
-        return qqHander.getAlbumsByArtist(artistId,pageIndex,pageSize);
+        return qqHander.getAlbumsByArtist(artistId, pageIndex, pageSize);
     }
 
     @Override
@@ -140,15 +140,15 @@ public class QQvipHander extends SearchHanderAbstract {
         String type = brType.getValue();
         JSONObject jsonObject = new JSONObject();
         String[] split = musicId.split(",");
-        if (musicId.contains(",")){
+        if (musicId.contains(",")) {
             jsonObject.put("id", split[0]);
             jsonObject.put("mediaId", split[1]);
-        }else{
+        } else {
             jsonObject.put("id", musicId);
         }
         jsonObject.put("type", type);
         SqConfig configKey = configService.getOne(new QueryWrapper<SqConfig>().eq("config_key", "plug.qqvip.baseurl"));
-            String baseUrl =  configKey.getConfigValue();
+        String baseUrl = configKey.getConfigValue();
 
         String url = HttpUtil.urlWithForm(baseUrl + "/song/url", jsonObject, Charset.forName("UTF-8"), true);
         OkHttpClient client = DownloadUtils.getOkHttpClient();
@@ -162,13 +162,28 @@ public class QQvipHander extends SearchHanderAbstract {
             String string = response.body().string();
             JSONObject jsonObject1 = JSONObject.parseObject(string);
             Integer code = jsonObject1.getInteger("result");
-            if (code!=null&&code.intValue()==100){
+            if (code != null && code.intValue() == 100) {
                 HashMap<String, String> stringStringHashMap = new HashMap<>();
                 String downloadurl = jsonObject1.getString("data");
-                if (downloadurl.contains("undefined")){
-                    HashMap<String, String> downloadUrl = getDownloadUrl(jsonObject.getString("id"), brType);
-                    if (downloadUrl!=null){
-                        return downloadUrl;
+                if (downloadurl.contains("undefined")) {
+                    JSONObject nestedobject = new JSONObject();
+                    nestedobject.put("id", jsonObject.getString("id"));
+                    nestedobject.put("type", type);
+                    String nestedurl = HttpUtil.urlWithForm(baseUrl + "/song/url", nestedobject, Charset.forName("UTF-8"), true);
+                    Request nestedrequest = new Request.Builder()
+                            .addHeader("Cookie", FreeCookieUtil.getCookieStr())
+                            .url(nestedurl)
+                            .get()
+                            .build();
+                    Response nestedresponse = client.newCall(nestedrequest).execute();
+                    String nestedbody = nestedresponse.body().string();
+                    JSONObject nestedjsonObject1 = JSONObject.parseObject(nestedbody);
+                    Integer nestedcode = nestedjsonObject1.getInteger("result");
+
+                    if (nestedcode != null && nestedcode.intValue() == 100) {
+                        downloadurl = nestedjsonObject1.getString("data");
+                    } else {
+                        log.error("获取下载地址失败music地址:{}", musicId);
                     }
                 }
                 stringStringHashMap.put("url", downloadurl);
@@ -178,12 +193,7 @@ public class QQvipHander extends SearchHanderAbstract {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            log.error("获取下载地址失败music地址:{}" ,musicId);
-            HashMap<String, String> downloadUrl = getDownloadUrl(jsonObject.getString("id"), brType);
-            if (downloadUrl!=null){
-                return downloadUrl;
-            }
-            return null;
+            log.error("获取下载地址失败music地址:{}", musicId);
         }
         return null;
     }
@@ -191,19 +201,19 @@ public class QQvipHander extends SearchHanderAbstract {
     @Override
     public DownloadEntity downloadSong(String musicid, PlugBrType brType, String musicname, String artistname, String albumname, Boolean isAudioBook, String addSubsonicPlayListName) {
         Music music = querySongById(musicid);
-        DownloadEntity downloadEntity = new DownloadEntity("qqvipHander",musicid, brType, music.getMusicName(), music.getMusicArtists(), music.getMusicAlbum(), isAudioBook, isAudioBook?addSubsonicPlayListName:null);
+        DownloadEntity downloadEntity = new DownloadEntity("qqvipHander", musicid, brType, music.getMusicName(), music.getMusicArtists(), music.getMusicAlbum(), isAudioBook, isAudioBook ? addSubsonicPlayListName : null);
         return downloadEntity;
     }
 
     @Override
     public DownloadEntity downloadSong(Music music, PlugBrType brType, Boolean isAudioBook, String addSubsonicPlayListName) {
-        DownloadEntity downloadEntity = new DownloadEntity("qqvipHander",music.getId(), brType, music.getMusicName(), music.getMusicArtists(), music.getMusicAlbum(), isAudioBook, isAudioBook?addSubsonicPlayListName:null);
+        DownloadEntity downloadEntity = new DownloadEntity("qqvipHander", music.getId(), brType, music.getMusicName(), music.getMusicArtists(), music.getMusicAlbum(), isAudioBook, isAudioBook ? addSubsonicPlayListName : null);
         return downloadEntity;
     }
 
     @Override
     public DownloadEntity downloadSong(Music music, PlugBrType brType, String addSubsonicPlayListName) {
-        DownloadEntity downloadEntity = new DownloadEntity("qqvipHander",music.getId(), brType, music.getMusicName(), music.getMusicArtists(), music.getMusicAlbum(), false, addSubsonicPlayListName);
+        DownloadEntity downloadEntity = new DownloadEntity("qqvipHander", music.getId(), brType, music.getMusicName(), music.getMusicArtists(), music.getMusicAlbum(), false, addSubsonicPlayListName);
         return downloadEntity;
     }
 
@@ -231,17 +241,17 @@ public class QQvipHander extends SearchHanderAbstract {
             if (!Boolean.getBoolean(albumSingerUnity.getConfigValue()) && !isAudioBook) {
                 change.set(md.getMusicArtists());
             }
-            PlugBrType plugBrType =null;
-            if(md.getBits()!=null&&md.getBits().size()>0){
+            PlugBrType plugBrType = null;
+            if (md.getBits() != null && md.getBits().size() > 0) {
                 ArrayList<PlugBrType> bits = md.getBits();
                 //找出最大的码率
-                 plugBrType = bits.stream().max(Comparator.comparing(PlugBrType::getBit)).get();
+                plugBrType = bits.stream().max(Comparator.comparing(PlugBrType::getBit)).get();
             }
             if (isAudioBook) {
-                downloadEntities.add(new DownloadEntity("qqvipHander",md.getId(), plugBrType==null?brType:plugBrType, md.getMusicName(), artist, albumName, isAudioBook));
+                downloadEntities.add(new DownloadEntity("qqvipHander", md.getId(), plugBrType == null ? brType : plugBrType, md.getMusicName(), artist, albumName, isAudioBook));
             } else {
                 //添加到缓存
-                downloadEntities.add(new DownloadEntity("qqvipHander",md.getId(), plugBrType==null?brType:plugBrType, md.getMusicName(), change.get(), md.getMusicAlbum()));
+                downloadEntities.add(new DownloadEntity("qqvipHander", md.getId(), plugBrType == null ? brType : plugBrType, md.getMusicName(), change.get(), md.getMusicAlbum()));
             }
 
         });
@@ -267,7 +277,7 @@ public class QQvipHander extends SearchHanderAbstract {
         String searchUrl = qqHander.getConfig().getSearchUrl();
         String s = qqHander.getqqSearchEntity().artistsTransferAlbumParam(artistId);
         Mapper mapper = DownloadUtils.getHttp().sync(searchUrl).setBodyPara(s).post().getBody().toMapper();
-        List<Album> albums = qqHander.getqqSearchEntity().artistsTransferAlbum(mapper,  qqHander.getConfig());
+        List<Album> albums = qqHander.getqqSearchEntity().artistsTransferAlbum(mapper, qqHander.getConfig());
         ArrayList<DownloadEntity> downloadEntitys = new ArrayList<>();
         for (Album album : albums) {
             ArrayList<DownloadEntity> downloadEntities = downloadAlbum(album.getAlbumId(), brType, addSubsonicPlayListName, album.getAlbumArtists(), false, album.getAlbumName());
