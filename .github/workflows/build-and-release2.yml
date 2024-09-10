@@ -51,11 +51,11 @@ jobs:
         run: |
           docker version
           # 登录阿里云镜像仓库
-          docker login --username=$DOCKER_USERNAME --password=$DOCKER_PASSWORD registry.cn-hangzhou.aliyuncs.com
+          docker login --username=$DOCKER_USERNAME --password=$DOCKER_PASSWORD
           # 使用Dockerfile构建镜像
-          docker build . --file Dockerfile_jar --tag registry.cn-hangzhou.aliyuncs.com/sqdockler/sq_docker:v$APP_VERSION
+          docker build . --file Dockerfile_jar --tag oozzbb/sqmusicplusserver:latest
           # 推送镜像到镜像仓库
-          docker push registry.cn-hangzhou.aliyuncs.com/sqdockler/sq_docker:v$APP_VERSION  
+          docker push oozzbb/sqmusicplusserver:latest  
 
   release:
     needs: build
