@@ -276,6 +276,8 @@ public class QQSearchEntity {
             plugSearchMusicResult.setAlbumid(albumId);
             plugSearchMusicResult.setLyricId(mid);
             plugSearchMusicResult.setLyric(lyricResult);
+            int i1 = e.toMapper().getInt("interval") * 1000;
+            plugSearchMusicResult.setDuration(i1+"");
 //            plugSearchMusicResult.setOter(e.toString());
             plugSearchMusicResults.add(plugSearchMusicResult);
 
@@ -368,7 +370,8 @@ public class QQSearchEntity {
                 setOther(JSONObject.parseObject(mapper1.toString()))
                 .setAlbumId(albumid)
                 .setArtistsId(artistId)
-                .setBits(longs);
+                .setBits(longs)
+                .setMusicDuration(mapper1.getInt("interval")*1000);
         return  music;
     }
 
