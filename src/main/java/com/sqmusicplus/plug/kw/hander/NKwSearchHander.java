@@ -391,45 +391,50 @@ public class NKwSearchHander extends SearchHanderAbstract {
     }
 
     @Override
-    public  ArrayList<DownloadEntity> downloadAlbum(String albumsId, PlugBrType brType,String addSubsonicPlayListName,String artist, Boolean isAudioBook, String albumName) {
-        ArrayList<DownloadEntity> downloadEntities = new ArrayList<>();
-        AtomicReference<String> change = new AtomicReference<>(artist);
-
-        String searchUrl = config.getAlbumInfoUrl().replaceAll("#\\{albumid}", albumsId);
-        AlbumInfoResult albumInfoResult = DownloadUtils.getHttp().sync(searchUrl)
-                .get()                          // GET请求
-                .getBody()                      // 响应报文体
-                .toBean(AlbumInfoResult.class);
-        List<AlbumInfoResult.MusiclistDTO> musiclist = albumInfoResult.getMusiclist();
-
-        SqConfig accompaniment = getConfigService().getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.ignore.accompaniment"));
-        SqConfig matchAlbumSinger = getConfigService().getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.strong.match.album.singer"));
-        SqConfig albumSingerUnity = getConfigService().getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.album.singer.unity"));
-
-        musiclist.forEach(md -> {
-            if (Boolean.getBoolean(accompaniment.getConfigValue())) {
-                if (md.getName().contains("(伴奏)") || md.getName().contains("(试听版)") || md.getName().contains("(片段)")) {
-                    return;
-                }
-            }
-            if (Boolean.getBoolean(matchAlbumSinger.getConfigValue()) && !isAudioBook) {
-                if (!md.getArtist().contains(change.get())) {
-                    return;
-                }
-            }
-            if (!Boolean.getBoolean(albumSingerUnity.getConfigValue()) && !isAudioBook) {
-                change.set(md.getArtist());
-            }
-            if (isAudioBook) {
-                downloadEntities.add(new DownloadEntity("nKwSearchHander",md.getId(), brType, md.getName(), artist, albumName, isAudioBook));
-            } else {
-                //添加到缓存
-                downloadEntities.add(new DownloadEntity("nKwSearchHander",md.getId(), brType, md.getName(), change.get(), albumInfoResult.getName()));
-            }
-
-        });
-        return downloadEntities;
+    public ArrayList<DownloadEntity> downloadAlbum(String albumsId, PlugBrType brType, String addSubsonicPlayListName, String artist, Boolean isAudioBook, String albumName) {
+       return downloadAlbum(albumsId, brType, addSubsonicPlayListName, artist, isAudioBook, albumName,0, 1000);
     }
+
+//    @Override
+//    public  ArrayList<DownloadEntity> downloadAlbum(String albumsId, PlugBrType brType,String addSubsonicPlayListName,String artist, Boolean isAudioBook, String albumName) {
+//        ArrayList<DownloadEntity> downloadEntities = new ArrayList<>();
+//        AtomicReference<String> change = new AtomicReference<>(artist);
+//
+//        String searchUrl = config.getAlbumInfoUrl().replaceAll("#\\{albumid}", albumsId);
+//        AlbumInfoResult albumInfoResult = DownloadUtils.getHttp().sync(searchUrl)
+//                .get()                          // GET请求
+//                .getBody()                      // 响应报文体
+//                .toBean(AlbumInfoResult.class);
+//        List<AlbumInfoResult.MusiclistDTO> musiclist = albumInfoResult.getMusiclist();
+//
+//        SqConfig accompaniment = getConfigService().getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.ignore.accompaniment"));
+//        SqConfig matchAlbumSinger = getConfigService().getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.strong.match.album.singer"));
+//        SqConfig albumSingerUnity = getConfigService().getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.album.singer.unity"));
+//
+//        musiclist.forEach(md -> {
+//            if (Boolean.getBoolean(accompaniment.getConfigValue())) {
+//                if (md.getName().contains("(伴奏)") || md.getName().contains("(试听版)") || md.getName().contains("(片段)")) {
+//                    return;
+//                }
+//            }
+//            if (Boolean.getBoolean(matchAlbumSinger.getConfigValue()) && !isAudioBook) {
+//                if (!md.getArtist().contains(change.get())) {
+//                    return;
+//                }
+//            }
+//            if (!Boolean.getBoolean(albumSingerUnity.getConfigValue()) && !isAudioBook) {
+//                change.set(md.getArtist());
+//            }
+//            if (isAudioBook) {
+//                downloadEntities.add(new DownloadEntity("nKwSearchHander",md.getId(), brType, md.getName(), artist, albumName, isAudioBook));
+//            } else {
+//                //添加到缓存
+//                downloadEntities.add(new DownloadEntity("nKwSearchHander",md.getId(), brType, md.getName(), change.get(), albumInfoResult.getName()));
+//            }
+//
+//        });
+//        return downloadEntities;
+//    }
 
     @Override
     public List<DownloadEntity> downloadArtistAllSong(String artistId, PlugBrType brType,String addSubsonicPlayListName) {
@@ -578,6 +583,67 @@ public class NKwSearchHander extends SearchHanderAbstract {
         }
         return collect;
 
+    }
+
+    public  ArrayList<DownloadEntity> downloadAlbum(String albumsId, PlugBrType brType,String addSubsonicPlayListName,String artist, Boolean isAudioBook, String albumName,Integer pageNumber, Integer pageSize) {
+        if (pageNumber==null){
+            pageNumber=0;
+        }
+        pageSize=pageSize==null?1000:pageSize;
+
+        ArrayList<DownloadEntity> downloadEntities = new ArrayList<>();
+        AtomicReference<String> change = new AtomicReference<>(artist);
+        String searchUrl = config.getAlbumInfoUrl().replaceAll("#\\{albumid}", albumsId);
+        searchUrl = searchUrl.replaceAll("#\\{pn}", pageNumber.toString());
+        searchUrl = searchUrl.replaceAll("#\\{pagesize}", pageSize.toString());
+        AlbumInfoResult albumInfoResult = DownloadUtils.getHttp().sync(searchUrl)
+                .get()                          // GET请求
+                .getBody()                      // 响应报文体
+                .toBean(AlbumInfoResult.class);
+        List<AlbumInfoResult.MusiclistDTO> musiclist = albumInfoResult.getMusiclist();
+        String songnum = albumInfoResult.getSongnum();
+        //判断是否需分页查询
+        if (Integer.parseInt(songnum) > pageSize) {
+            int countsize = Integer.parseInt(songnum) % pageSize == 0 ? Integer.parseInt(songnum) / pageSize : Integer.parseInt(songnum) / pageSize + 1;
+            for (int i = 1; i < countsize; i++) {
+                String addsearchUrl = config.getAlbumInfoUrl().replaceAll("#\\{albumid}", albumsId);
+                addsearchUrl = addsearchUrl.replaceAll("#\\{pn}", i+"");
+                addsearchUrl = addsearchUrl.replaceAll("#\\{pagesize}", pageSize.toString());
+                AlbumInfoResult addalbumInfoResult = DownloadUtils.getHttp().sync(addsearchUrl)
+                        .get()                          // GET请求
+                        .getBody()                      // 响应报文体
+                        .toBean(AlbumInfoResult.class);
+                musiclist.addAll(addalbumInfoResult.getMusiclist());
+            }
+        }
+
+        SqConfig accompaniment = getConfigService().getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.ignore.accompaniment"));
+        SqConfig matchAlbumSinger = getConfigService().getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.strong.match.album.singer"));
+        SqConfig albumSingerUnity = getConfigService().getOne(new QueryWrapper<SqConfig>().eq("config_key", "music.album.singer.unity"));
+
+        musiclist.forEach(md -> {
+            if (Boolean.getBoolean(accompaniment.getConfigValue())) {
+                if (md.getName().contains("(伴奏)") || md.getName().contains("(试听版)") || md.getName().contains("(片段)")) {
+                    return;
+                }
+            }
+            if (Boolean.getBoolean(matchAlbumSinger.getConfigValue()) && !isAudioBook) {
+                if (!md.getArtist().contains(change.get())) {
+                    return;
+                }
+            }
+            if (!Boolean.getBoolean(albumSingerUnity.getConfigValue()) && !isAudioBook) {
+                change.set(md.getArtist());
+            }
+            if (isAudioBook) {
+                downloadEntities.add(new DownloadEntity("nKwSearchHander",md.getId(), brType, md.getName(), artist, albumName, isAudioBook));
+            } else {
+                //添加到缓存
+                downloadEntities.add(new DownloadEntity("nKwSearchHander",md.getId(), brType, md.getName(), change.get(), albumInfoResult.getName()));
+            }
+
+        });
+        return downloadEntities;
     }
 
 
