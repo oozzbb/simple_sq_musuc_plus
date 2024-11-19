@@ -199,7 +199,7 @@ public class ALLController {
      * @param keyword 关键字
      * @param pageSize 每页长度 最大50
      * @param pageIndex 页码 从1开始
-     * @return
+     * @returnparserUrlAndDownload
      */
     @SaCheckLogin
     @GetMapping("/searchArtist/{searchType}/{keyword}/{pageSize}/{pageIndex}")
@@ -423,8 +423,6 @@ public class ALLController {
                                 .setDownloadTime(new Date());
                         Boolean add = downloadInfoService.add(downloadInfo);
                     }
-
-
                 } catch (Exception e) {
                     log.error("没有查询出错：" + parserEntity+"  "+e.getMessage());
                     continue;
