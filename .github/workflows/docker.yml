@@ -41,7 +41,7 @@ jobs:
         run: |
           mvn -B package --file pom.xml
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: java-artifact
           path: |
@@ -55,7 +55,7 @@ jobs:
           # 使用Dockerfile构建镜像
           docker build . --file Dockerfile_jar --tag $DOCKER_USERNAME/sqmusicplusserver:latest
           # 推送镜像到镜像仓库
-          docker push oozzbb/sqmusicplusserver:latest  
+          docker push $DOCKER_USERNAME/sqmusicplusserver:latest  
 
   release:
     needs: build
@@ -63,7 +63,7 @@ jobs:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/2.0' }}
     steps:
       - name: Download Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: java-artifact
       - name: Display structure of downloaded files
