@@ -19,7 +19,7 @@ jobs:
         uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
         with:
           upstream_sync_repo: 59799517/simple_sq_musuc_plus
-          upstream_sync_branch: 2.0
-          target_sync_branch: 2.0
+          upstream_sync_branch: "2.0"
+          target_sync_branch: "2.0"
           target_repo_token: ${{ secrets.GITHUB_TOKEN }} # automatically generated, no need to set
           test_mode: false
